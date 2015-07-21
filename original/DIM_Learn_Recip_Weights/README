@@ -1,0 +1,96 @@
+----------------------------------------------------------------------------
+INTRODUCTION
+----------------------------------------------------------------------------
+
+This code implements the simulation results reported in:
+
+     M. W. Spratling (2012) Unsupervised learning of generative and 
+     discriminative weights encoding elementary image components in a predictive
+     coding model of cortical function, Neural Computation, 24(1): 60-103.
+
+Please cite this paper if this code is used in, or to motivate, any publications. 
+
+----------------------------------------------------------------------------
+USAGE
+----------------------------------------------------------------------------
+
+This code was tested with MATLAB Version 7.10 (R2010a).
+
+To use this software:
+    run matlab 
+    >> cd to the directory containing this code 
+
+
+To perform the experiments on learning the bars problem using a single PC/BC
+processing stage (as described in section 3.1 of the paper), do the following:
+   >> [X,W,V,U]=learn_bars_feedback;
+To change the version of the bars problem, the size of the network, the amount
+of noise, or other parameter values, you should edit this script. The script
+META_learn is useful for performing multiple trials automatically.
+
+
+
+To perform the experiments on learning natural images using a single PC/BC
+processing stage (as described in section 3.2 of the paper), do the following.
+
+To learn the RFs:
+   >> [X,W,V,U]=learn_natural_image_patches; 
+To change the size of the image patches, to change other parameter values, or
+the name of the image data file you should edit this script. Somewhere on your
+MATLAB path you will need a set of greyscale natural images stored in a .mat
+file.
+
+To reconstruct the RFs using reverse correlation:
+   >> [RF]=reverse_correl(W,V,1.5);
+Note, this requires the image patches, and hence the weights learnt from them, to
+have an odd size (e.g. 11x11 pixels, not 12x12 pixels).
+
+To fit Gabor functions to the reconstructed RF:
+   >> [best_fit,best_fit_params]=fit_gabor_with_ga(RF,[11,11],1.5);
+This makes use of the GAOT toolbox, which must therefore also be on your
+path. The GA often produces poor fits, to improve the results you might use the
+functions META_fit_gabor_with_ga and/or combine_ga_results to get the best fits
+taken from a number of runs of the GA.
+
+To measure the sparsity and selectivity of the trained network:
+   >> measure_sparsity([],W,V);
+To plot conditional response histograms:
+   >> measure_conditional_response(W,V,node);
+where node is the index of the prediction neuron you want to plot the histograms
+for.
+To perform image reconstruction:
+   >> measure_reconstruction_quality(W,V,I);
+where I is the greyscale image you wish to reconstruct.
+To measure the NMSE between random image patches and their reconstructions:
+   >> measure_reconstruction_error(W,V);
+
+
+
+To perform the experiments on learning natural images using a hierarchical PC/BC
+network (as described in section 3.3 of the paper), do the following.
+
+To learn the RFs:
+   >> [X,Wrecon,Vrecon,Urecon,W,V,U]=learn_natural_image_patches_hierarchy;
+
+To test the response properties using the Ito and Komatsu angles dataset:
+   >> test_response_of_V2(W,V,U);
+This function makes use of nansuite toolbox by Jan Glaescher, available here:
+http://www.mathworks.com/matlabcentral/fileexchange/6837
+
+
+
+To assess the response properties of neurons with V1-like RFs (as described in
+both section 3.2 and 3.3 of the paper), do the following:
+   >> V1_orientation_tuning_contrast(W,V,node,best_params);
+   >> V1_size_tuning(W,V,node,best_params);
+   >> V1_spatial_frequency_tuning_contrast(W,V,node,best_params);
+   >> V1_temporal_frequency_tuning(W,V,node,best_params);
+   >> V1_cross_orient_orient(W,V,node,best_params);
+Where W and V are the weights for the model of V1 learnt using either
+learn_natural_image_patches (W and V) or learn_natural_image_patches_hierarchy
+(W{1} and V{1}), node is the index of the prediction neuron whose response is
+to be recorded, and best_params is vector defining the parameters of the
+sinusoidal grating that produces the maximal response from the recorded node,
+which can be found using:
+   >> best_params=V1_best_params(W,V,node);
+

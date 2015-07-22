@@ -19,6 +19,15 @@ mincontrast=1;
 %probs=0.02+0.18*rand(1,numsquares);
 %mincontrast=0.1;
 
+%constructive parameters
+t0 = 1;                      %time of last added neuron
+window = 1;                  %window for slope calculation
+tslope = 0.05;               %trigger slope
+esptsh = 0.45;               %average error until exponential growth
+cutavg = 0.25;               %average error to cut growing
+stop   = 0;                  %boolean value to stop growing
+eavgs  = zeros(1, epochs);   %average errors per epochs
+
 %generate a fixed pattern set
 clear data
 for k=1:patterns
@@ -29,15 +38,6 @@ end
 W=(1/16)+(1/64).*randn(n,m);%Gassian distributed weights with given
 							%mean and standard deviation				   
 W(W<0)=0;			
-
-%constructive parameters
-t0 = 1;                      %time of last added neuron
-window = 1;                  %window for slope calculation
-tslope = 0.05;               %trigger slope
-esptsh = 0.45;               %average error until exponential growth
-cutavg = 0.25;               %average error to cut growing
-stop   = 0;                  %boolean value to stop growing
-eavgs  = zeros(1, epochs);   %average errors per epochs
 
 %learn receptive fields
 for t=1:epochs
@@ -55,10 +55,12 @@ for t=1:epochs
     y=zeros(n,1);
     for i=1:iterations
       e=x./(epsilon+(What'*y));
-	  y=(epsilon+y).*(W*e);
+      y=(epsilon+y).*(W*e);
     end
     
-    eavg = (eavg*(k-1) + mean(abs(e(e>0) - 1))) / k;
+    if size(e(e>0), 1) > 0,
+      eavg = (eavg*(k-1) + mean(abs(e(e>0) - 1))) / k;
+    end;
     
     %update weights
     W=W.*( 1 + beta.*( y*(e'-1) ));
@@ -88,7 +90,6 @@ for t=1:epochs
     elseif t - window >= t0,
       if (abs(eavgs(t) - eavgs(t - window)) / eavgs(t0)) < tslope,
         t0 = t;
-        %add neuron
         n = n + 1;
         W=(1/16)+(1/64).*randn(n,m);			   
         W(W<0) = 0;

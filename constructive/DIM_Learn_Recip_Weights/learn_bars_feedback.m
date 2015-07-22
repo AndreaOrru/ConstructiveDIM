@@ -9,13 +9,23 @@ p=5;                     %length of one side of input image/number of bars at
                          %each orientation
 n=24;                    %number of nodes
 m=p*p;                   %number of inputs
-cycs=20000;              %number of training cycles 
+epochs=20;               %number of training epochs
+cycs=1000;               %number of training cycles per epoch
 patterns=400;            %number of training patterns in training set
-show=1000;               %how often to plot receptive field data
-noise=0.1;                 %amount of noise to add to each training pattern
+noise=0.1;               %amount of noise to add to each training pattern
 continuousLearning=0;    %learn at every iteration, or using steady-state responses
-dispresults=0;
+dispresults=1;
 figoffset=0;
+
+%constructive parameters
+t0 = 1;                      %time of last added neuron
+window = 1;                  %window for slope calculation
+tslope = 0.05;               %trigger slope
+esptsh = 0.45;               %average error until exponential growth
+cutavg = 0.25;               %average error to cut growing
+stop   = 0;                  %boolean value to stop growing
+eavgs  = zeros(1, epochs);   %average errors per epochs
+
 
 %GENERATE TRAINING DATA
 prob=1/p;
@@ -49,38 +59,48 @@ end
 ymax=0;
 y=[];
 %TRAIN NETWORK
-for k=1:cycs
-  if rem(k,5000)==0, fprintf(1,'.%i.',k); end
+for t=1:epochs
+  fprintf(1, 'Epoch %i, ', t);
+  eavg = 0;
+  
+  for k=1:cycs
+    %choose an input stimulus from the training set
+    patternNum=fix(rand*patterns)+1; %random order
+    x=X(:,patternNum);
+    %OR
+    %generate a new pattern at each training cycle 
+    %x=pattern_bars(p,prob,gen,noise);
 
-  %choose an input stimulus from the training set
-  patternNum=fix(rand*patterns)+1; %random order
-  x=X(:,patternNum);
-  %OR
-  %generate a new pattern at each training cycle 
-  %x=pattern_bars(p,prob,gen,noise);
-
-  if continuousLearning  
-	%calculate node activations and learn at each iteration
-	[y,e,W,V,U]=dim_activation(W,x,y,1+floor(rand*2*iterations),V,beta/iterations,U);
-  else	
-	%OR calculate node activations for a set number of iterations then learn
-	[y,e]=dim_activation(W,x,y,iterations,V);
-	[W,V]=dim_learn(W,V,y,e,beta);
-	U=dim_learn_feedback(U,y,x,beta);
+    if continuousLearning  
+	  %calculate node activations and learn at each iteration
+	  [y,e,W,V,U]=dim_activation(W,x,y,1+floor(rand*2*iterations),V,beta/iterations,U);
+    else	
+	  %OR calculate node activations for a set number of iterations then learn
+	  [y,e]=dim_activation(W,x,y,iterations,V);
+	  [W,V]=dim_learn(W,V,y,e,beta);
+	  U=dim_learn_feedback(U,y,x,beta);
+    end
+  
+    if size(e(e>0), 1) > 0,
+      eavg = (eavg*(k-1) + mean(abs(e(e>0) - 1))) / k;
+    end;
+    ymax=max([ymax,max(y)]);  
   end
   
-  ymax=max([ymax,max(y)]);  
+  fprintf(1, 'nodes: %i, error: %f\n',n,eavg);
+  eavgs(t) = eavg;
+  
   %show results
-  if rem(k,show)==0 & dispresults
-	set(0,'CurrentFigure',1+figoffset); plot_bars(gen,W);
-	set(0,'CurrentFigure',2+figoffset); plot_bars(gen,V);
-	set(0,'CurrentFigure',3+figoffset); plot_bars(gen,U);
-	disp([' ymax=',num2str(ymax),' wSum=',num2str(max(sum(W'))),' vSum=',...
-		  num2str(max(sum(V'))),' uSum=',num2str(max(sum(U')))]);
-	ymax=0;
+  if dispresults
+    set(0,'CurrentFigure',1+figoffset); plot_bars(gen,W);
+    set(0,'CurrentFigure',2+figoffset); plot_bars(gen,V);
+    set(0,'CurrentFigure',3+figoffset); plot_bars(gen,U);
+    disp([' ymax=',num2str(ymax),' wSum=',num2str(max(sum(W'))),' vSum=',...
+        num2str(max(sum(V'))),' uSum=',num2str(max(sum(U')))]);
+    ymax=0;
   end
 end
-
+  
 if dispresults
   sw=sum(W'), disp(num2str([max(sw),min(sw),max(max(W)),min(min(W))]))
   sv=sum(V'), disp(num2str([max(sv),min(sv),max(max(V)),min(min(V))]))

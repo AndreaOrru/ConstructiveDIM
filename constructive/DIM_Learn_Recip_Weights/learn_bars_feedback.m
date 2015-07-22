@@ -7,7 +7,7 @@ if nargin<1
 end
 p=5;                     %length of one side of input image/number of bars at
                          %each orientation
-n=24;                    %number of nodes
+n=2;                     %number of nodes
 m=p*p;                   %number of inputs
 epochs=20;               %number of training epochs
 cycs=1000;               %number of training cycles per epoch
@@ -21,8 +21,8 @@ figoffset=0;
 t0 = 1;                      %time of last added neuron
 window = 1;                  %window for slope calculation
 tslope = 0.05;               %trigger slope
-esptsh = 0.45;               %average error until exponential growth
-cutavg = 0.25;               %average error to cut growing
+esptsh = 1.00;               %average error until exponential growth
+cutavg = 0.70;               %average error to cut growing
 stop   = 0;                  %boolean value to stop growing
 eavgs  = zeros(1, epochs);   %average errors per epochs
 
@@ -81,9 +81,10 @@ for t=1:epochs
 	  U=dim_learn_feedback(U,y,x,beta);
     end
   
-    if size(e(e>0), 1) > 0,
+    if ~isempty(e(e>0)),
       eavg = (eavg*(k-1) + mean(abs(e(e>0) - 1))) / k;
     end;
+    
     ymax=max([ymax,max(y)]);  
   end
   
@@ -99,6 +100,31 @@ for t=1:epochs
         num2str(max(sum(V'))),' uSum=',num2str(max(sum(U')))]);
     ymax=0;
   end
+  
+  %check stop condition
+  if eavgs(t) <= cutavg,
+      stop = 1;
+  end;
+  
+  %check growing condition
+  if ~stop,
+    %esponential growth
+    if eavg >= esptsh,
+      t0 = t;
+      n = n * 2;
+      [W,V,U]=weight_initialisation_random(n,m);
+      y = [];
+    
+    %gradual growing
+    elseif t - window >= t0,
+      if (abs(eavgs(t) - eavgs(t - window)) / eavgs(t0)) < tslope,
+        t0 = t;
+        n = n + 1;
+        [W,V,U]=weight_initialisation_random(n,m);
+        y = [];
+      end;
+    end;
+  end;
 end
   
 if dispresults

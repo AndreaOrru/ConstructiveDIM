@@ -9,4 +9,4 @@ U=gaussian_weights(n,m,wMean,wStd);
 
 function W=gaussian_weights(n,m,wMean,wStd)
 W=wMean+wStd.*randn(n,m,'single'); %Gaussian distributed weights with given
-W(find(W<0))=0;  		           %mean and standard deviation				   
+W(W<0)=0;                          %mean and standard deviation				   

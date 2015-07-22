@@ -58,7 +58,7 @@ for t=1:epochs
       y=(epsilon+y).*(W*e);
     end
     
-    if size(e(e>0), 1) > 0,
+    if ~isempty(e(e>0)),
       eavg = (eavg*(k-1) + mean(abs(e(e>0) - 1))) / k;
     end;
     
@@ -78,7 +78,7 @@ for t=1:epochs
   end;
   
   %check growing condition
-  if stop == 0,
+  if ~stop,
     %esponential growth
     if eavg >= esptsh,
       t0 = t;

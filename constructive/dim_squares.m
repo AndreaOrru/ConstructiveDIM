@@ -8,10 +8,10 @@ epsilon=1e-10;
 %define task
 p=6;                     %length of one side of input image
 s=3;                     %size of square image components
-n=48;                    %number of nodes
+n=4;                     %number of nodes
 m=p*p;                   %number of inputs
-cycs=20000;              %number of training cycles 
-show=1000;               %how often to plot receptive field data
+epochs=25;               %number of training epochs
+cycs=1000;               %number of training cycles per epoch
 patterns=1000;           %number of training patterns in training set
 numsquares=(p-s+1).^2;
 probs=0.1*ones(1,numsquares);
@@ -28,32 +28,73 @@ end
 %define initial weights
 W=(1/16)+(1/64).*randn(n,m);%Gassian distributed weights with given
 							%mean and standard deviation				   
-W(find(W<0))=0;			
+W(W<0)=0;			
+
+%constructive parameters
+t0 = 1;                      %time of last added neuron
+window = 1;                  %window for slope calculation
+tslope = 0.05;               %trigger slope
+esptsh = 0.45;               %average error until exponential growth
+cutavg = 0.25;               %average error to cut growing
+stop   = 0;                  %boolean value to stop growing
+eavgs  = zeros(1, epochs);   %average errors per epochs
 
 %learn receptive fields
-for k=1:cycs
-  if rem(k,1000)==0, fprintf(1,'.%i.',k); end
-  
-  patternNum=fix(rand*patterns)+1; %random order
-  x=data(:,patternNum);
+for t=1:epochs
+  fprintf(1, 'Epoch %i, ', t);
+  eavg = 0;
 
-  What=W./(epsilon+(max(W')'*ones(1,m)));%weights into nodes normalised by
-                                         %maximum value
+  for k=1:cycs
+    patternNum=fix(rand*patterns)+1; %random order
+    x=data(:,patternNum);
+
+    What=W./(epsilon+(max(W')'*ones(1,m)));%weights into nodes normalised by
+                                           %maximum value
 										 
-  %iterate to calculate node activations
-  y=zeros(n,1);
-  for i=1:iterations
-	e=x./(epsilon+(What'*y));
-	y=(epsilon+y).*(W*e);
-  end 
-  %update weights
-  W=W.*( 1 + beta.*( y*(e'-1) ));
-  W(find(W<0))=0; 
-
-  if rem(k,show)==0,
-	%show weights
-	squares_plot(s,W);
+    %iterate to calculate node activations
+    y=zeros(n,1);
+    for i=1:iterations
+      e=x./(epsilon+(What'*y));
+	  y=(epsilon+y).*(W*e);
+    end
+    
+    eavg = (eavg*(k-1) + mean(abs(e(e>0) - 1))) / k;
+    
+    %update weights
+    W=W.*( 1 + beta.*( y*(e'-1) ));
+    W(W<0)=0; 
   end
+  
+  %show weights
+  fprintf(1,'nodes: %i, error: %f, ',n,eavg);
+  eavgs(t) = eavg;
+  squares_plot(s,W);
+  
+  %check stop condition
+  if eavgs(t) <= cutavg,
+      stop = 1;
+  end;
+  
+  %check growing condition
+  if stop == 0,
+    %esponential growth
+    if eavg >= esptsh,
+      t0 = t;
+      n = n * 2;
+      W=(1/16)+(1/64).*randn(n,m);			   
+      W(W<0)=0;	
+    
+    %gradual growing
+    elseif t - window >= t0,
+      if (abs(eavgs(t) - eavgs(t - window)) / eavgs(t0)) < tslope,
+        t0 = t;
+        %add neuron
+        n = n + 1;
+        W=(1/16)+(1/64).*randn(n,m);			   
+        W(W<0) = 0;
+      end;
+    end;
+  end;
 end
 
 s=sum(W'), disp(num2str([max(s),min(s),max(max(W)),min(min(W))]))

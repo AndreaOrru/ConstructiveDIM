@@ -1,0 +1,6 @@
+#!/bin/bash
+
+pdflatex outline.tex
+bibtex outline.aux
+pdflatex outline.tex
+pdflatex outline.tex

@@ -1,6 +1,3 @@
-!thesis/cover.pdf
-
-
 ## Matlab:
 *.m~
 *.asv
@@ -144,3 +141,7 @@ sympy-plots-for-*.tex/
 # WinEdt
 *.bak
 *.sav
+
+
+## Exceptions:
+!thesis/cover.pdf

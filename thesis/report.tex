@@ -1,0 +1,54 @@
+\documentclass[11pt,a4paper]{report}
+
+\usepackage[titletoc]{appendix}
+\usepackage[intoc]{nomencl}
+\usepackage{setspace}
+\usepackage{pdfpages}
+\usepackage{tocbibind}
+
+\newcommand{\quot}[1]{``#1''}
+\boldmath
+
+\singlespacing
+\makenomenclature
+
+\begin{document}
+	\includepdf{cover}
+	
+	\begin{abstract}
+		This is the abstract.
+	\end{abstract}
+	
+	\tableofcontents
+
+	\printnomenclature
+	\listoffigures
+	\listoftables
+	
+	\chapter{Introduction}
+		\nomenclature{y}{A very cool variable.}
+		\section{Introduction}
+		\section{Objectives}
+		\section{Structure}
+	
+	\chapter{Literature Survey}
+		\section{Background}
+		\section{Theories}
+	
+	\chapter{Main Result}
+		\section{Theoretical Development}
+		\section{Analysis and Design}
+		\section{Implementation and Experimental Work}
+		\section{Results}
+		\section{Discussion}
+		
+	\chapter{Conclusion}
+	
+	\bibliographystyle{plain}
+	\bibliography{references}
+	\nocite{*}
+	
+	\begin{appendices}
+		\chapter{Source Code}
+	\end{appendices}
+\end{document}

@@ -49,9 +49,9 @@
 		
 		\newpage
 		
-		In the present project I worked on the development of a constructive version of the DIM\footnote{Divisive Input Modulation.} learning algorithm, as described in \cite{spratling2009unsupervised}, and its derivation \cite{spratling2012unsupervised} used in the \emph{non-linear} PC/BC model\footnote{Predictive Coding as Biased Competition} \cite{spratling2008predictive}. The original algorithm has been developed to train a variation of \emph{negative feedback networks} and has proven to be very successful in the unsupervised learning of image components, yielding state-of-the-art performances in some standard benchmarks.
+		In the present project I worked on the development of a constructive version of the DIM\footnote{Divisive Input Modulation.} learning algorithm, as described in \cite{spratling2009unsupervised}, and its derivation \cite{spratling2012unsupervised} used in the \emph{non-linear} PC/BC model\footnote{Predictive Coding as Biased Competition} \cite{spratling2008predictive}. The original algorithm has been developed to train a variation of \emph{negative feedback networks} and has proven to be very successful in the unsupervised learning of image components, yielding state-of-the-art performances in various benchmarks, even in the presence of occlusion and overlapping \cite{spratling2009unsupervised}.
 		
-		One one hand, the main feature of negative feedback networks is the competition between nodes, which enables them to be selective for different input stimuli by making the individual synaptic weights more distinct. This is achieved by having inhibiting (\emph{divisive}) feedback connections from the output neurons back to their input nodes \cite{spratling2009unsupervised}. 
+		On one hand, the main feature of negative feedback networks is the competition between nodes, which enables them to be selective for different input stimuli by making the individual synaptic weights more distinct. This is achieved by having inhibiting (\emph{divisive}) feedback connections from the output neurons back to their input nodes \cite{spratling2009unsupervised}. 
 		
 		On the other hand, the PC model proposes a hierarchical architecture in which alternating populations of \emph{error-detecting} and \emph{predicting} nodes interact with each other to carry out the perception process \cite{spratling2014predictive}. In particular, the higher levels of the network are not limited to passively receiving the input from the preceding nodes, but instead they actively predict the input they expect to receive. Feedback connections convey the predictions, while feedforward connection transmit the residual error between those predictions and actual input \cite{spratling2008predictive}.
 
@@ -64,33 +64,35 @@
 		A connection can be drawn between these two models. If we consider negative feedback networks from an equivalent perspective, namely a generative one, it can be shown that the higher level of the network produces a \emph{reconstruction} of the input via the feedback connections; while feedforward connections instead convey \emph{residual error} between the top-down prediction and the bottom-up input \cite{spratling2009unsupervised}, much like in the PC model.
 		Symmetrically, \emph{Predictive Coding} can be redefined as a form of \emph{Biased Competition} \cite{spratling2008predictive}.
 		
-		Algorithms that work for one model can thus be adapted to work for the other one. In particular, PC/BC networks trained using the DIM algorithm are referred to as PC/BC--DIM. Most notably, in this model the training of the weights of feedforward and feedback connections can be performed simultaneously and independently, thus providing a biologically sound computational theory explaining how reciprocal connections are learnt in actual cortical areas \cite{callaway1998local}\cite{spratling2012unsupervised}.
+		Algorithms that work for one model can thus be adapted to work for the other one. In particular, PC/BC networks trained using the DIM algorithm are referred to as PC/BC--DIM. Most notably, in this model the training of the weights of feedforward and feedback connections can be performed simultaneously and independently, thus providing a biologically sound computational theory explaining how reciprocal connections are learnt in actual cortical areas \cite{callaway1998local,spratling2012unsupervised}.
 		
 		\section{The project}
-		The main focus of the project has been in improving the PC/BC--DIM algorithm with the ability to progressively grow a near-optimal network topology alongside the feedforward and feedback weights. In the process, a constructive version of the basic DIM algorithm has also been implemented.
+		The main focus of the project has been in improving the PC/BC--DIM algorithm with the ability to progressively grow a near-optimal network topology alongside the feedforward and feedback weights. In the process, I also implemented a constructive version of the basic DIM algorithm.
 		
 		The project aim is to provide an enhanced version of the original algorithm which performs equally well but produces smaller networks that can be trained faster.
 		
-		The structure of the problem is well suited for the design of a constructive variant. The network is fully connected between the error and the prediction layers, so there is no need to 
-		consider all the possible partial connections \cite{?}.
+		The structure of the problem is well suited for the design of a constructive variant. The network is fully connected between the error-detecting and the prediction layers, so there is no need to consider all the possible partial connections \cite{?}.
 		
 		In the context of image decomposition, the pixel values act as the input which is fed to the error-detecting neurons, while the output of the nodes in the predictive layer represents the degree by which that component participates to the generation of the image. According to this interpretation, the weights associated to the connections targeting each prediction neuron are thus a \quot{basic vector}, or \quot{elementary component} of the images to be reconstructed \cite{spratling2014predictive}.
 
-		Furthermore, the number of neurons in the error layer is fixed to the number of input units. Thus the algorithm regulating the evolution of the network has to focus only on the output layer, by tuning its number of neurons when deemed necessary. That corresponds to determining the number of distinct components which are needed to decompose the images in the training set. As already stated, this value is in general not known \emph{a priori}, and as such it is especially suited to be the target of the constructive algorithm.
-
-		\begin{itemize}
-			\item Show what neurons are we interested in growing by looking at the predictive model.
-			\item Maybe show some images of the network?
-			\item Describe the idea of having thresholds for error because of what error represents.
-			\item Briefly mention literature about constructive network techniques.
-			\item What kind of results I am getting.
-			\item Contributions
-		\end{itemize}
+		Furthermore, the number of neurons in the error layer is fixed to the number of input units. Thus the algorithm regulating the evolution of the network has to focus only on the output layer, by tuning its number of neurons when deemed necessary. That corresponds to determining the number of distinct components which are needed to decompose the images in the training set. As already stated, this value is in general not known \emph{a priori}, and it has been the obvious target of the implemented algorithm.
+		
+		Any type of constructive algorithm needs some kind of way to measure the error of the network to be able to decide whether and when adding a neuron to it. Conveniently, in the present case that quantity is embedded directly into the network itself, in the form of its error-detection layer. I performed experiments with different sets of criteria based on this measure, starting with those available in the literature describing the state-of-the-art, and modifying them and fine-tuning them to better fit the problem at hand.
+		
+		Tested with some standard benchmarks, specifically the \emph{bars} \cite{spratling2012unsupervised} and \emph{squares} problem \cite{spratling2009unsupervised}, the developed constructive algorithm has reported state-of-the-art results on the same level of accuracy of the original, while at the same time consistently building smaller networks.
+		
+		In summary, the work conducted for this project represents a sensible improvement over the
+		state-of-the-art DIM algorithm in term of training times and optimality of the size of the network.
 
 		\section{Structure of the report}
+		The main part of the report is structured as follows:
 		\begin{itemize}
-			\item Structure of the report.
+			\item Chapter 1 acts as an introduction to the project, its goals and the problem it solves;
+			\item Chapter 2 provides a survey of the literature, with references to the relevant choices made during the project's undertaking;
+			\item Chapter 3 describes the work conducted in full detail and evaluates the results against the other algorithms described in the literature review;
+			\item Chapter 4 concludes the body of the document by summarizing the main points of the work and pointing at possible future developments.
 		\end{itemize}
+		A list of the bibliographic references and an appendix containing the whole source code of the project terminate the report.
 	
 	\chapter{Literature Survey}
 		\section{Background}

@@ -8,9 +8,10 @@
 \usepackage{tocbibind}
 
 \newcommand{\quot}[1]{``#1''}
-\boldmath
 
 \singlespacing
+\boldmath
+\setcounter{tocdepth}{4}
 \makenomenclature
 
 
@@ -41,7 +42,7 @@
 		
 		To overcome this problem, solutions that involve learning both the\\weights of the synapses \emph{and} the network topology have been suggested \cite{parekh2000constructive}.
 		
-		One of the proposed answers is the class of algorithms of the so-called \emph{constructive neural networks}. The main idea behind it is starting from a minimal architecture and then adding hidden layers, nodes and connections during training \cite{sharma2010constructive}.
+		One of the proposed answers is the class of algorithms of the so-called \emph{constructive neural networks}. The main idea behind it is starting from a minimal architecture and then adding hidden layers, nodes and connections during training \cite{kotsiantis2007supervised,sharma2010constructive}.
 		
 		Such algorithms provides the flexibility to explore the space of neural network topologies in a controlled, \emph{data-driven} fashion. Furthermore, because small solutions are found first, this method has the potential to discover near-minimal networks that approximately match the complexity of the learning task \cite{parekh2000constructive}.
 		
@@ -94,9 +95,41 @@
 		\end{itemize}
 		A list of the bibliographic references and an appendix containing the whole source code of the project terminate the report.
 	
-	\chapter{Literature Survey}
-		\section{Background}
-		\section{Theories}
+	
+	\chapter{Literature Review}
+		\section{Artificial Neural Networks}
+		\begin{itemize}
+			\item General definition.
+			\item What are they able to do, theoretically and practically.
+			\item Composition of the network, layers etc.
+		\end{itemize}
+		
+			\subsection{Types of networks}
+				\subsubsection{Feed-forward networks}
+				\subsubsection{Recurrent networks}
+				\subsubsection{Deep or hierarchical networks}
+		
+			\subsection{Training algorithms}
+				\subsubsection{Supervised learning}
+				\subsubsection{Unsupervised learning}
+		
+		\section{Negative Feedback Networks}
+		The main idea.
+			\subsection{Fyfe's Network}
+			\subsection{Harpur's Network}
+	
+		\section{Non-negative Matrix Factorisation}
+		Image decomposition, main algorithm
+			\subsection{Sequential version}
+	
+		\section{Divisive Input Modulation}
+		This.
+
+		\section{PC/BC}
+			\subsection{Predictive coding}
+			\subsection{Predictive coding as biased competition}
+			\subsection{PC/BC--DIM}
+			
 	
 	\chapter{Main Result}
 		\section{Theoretical Development}

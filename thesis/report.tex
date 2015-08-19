@@ -155,13 +155,13 @@
 				Typically (but not necessarily) the neurons in each layer are only connected to the ones into the immediately following layer. If every node in each layer is connected to every other node in the adjacent layer, the neural network is said to be \emph{fully connected} (respectively \emph{partially connected}) \cite{haykin2009neural}. Figure~\ref{fig:feedforward} shows an example of such a network.
 				
 				\subsubsection{Recurrent networks}
-				Contrarily to feedforward networks, \emph{recurrent} neural networks have at least one \emph{feedback} loop. Feedback is present in a system when the output of an element influences (at least in part), the input applied to that same element.
-				\begin{figure}[b]
+				\begin{figure}[t]
 					\centering
 					\includegraphics[width=0.9\textwidth]{recurrent}
 					\caption{Recurrent neural network with hidden neurons \cite{haykin2009neural}.}
 					\label{fig:recurrent}
 				\end{figure}
+				Contrarily to feedforward networks, \emph{recurrent} neural networks have at least one \emph{feedback} loop. Feedback is present in a system when the output of an element influences (at least in part), the input applied to that same element. The presence of feedback loops has a deep impact on the learning capabilities of a network \cite{haykin2009neural}. Specifically, recurrent neural networks gain the ability to predict element in sequences on the basis of their predecessors. \cite
 				
 				\subsubsection{Deep or hierarchical networks}
 		

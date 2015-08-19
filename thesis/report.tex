@@ -2,12 +2,15 @@
 
 \usepackage[titletoc]{appendix}
 \usepackage{color}
+\usepackage{float}
+\usepackage{graphicx}
 \usepackage[intoc]{nomencl}
 \usepackage{setspace}
 \usepackage{pdfpages}
 \usepackage{tocbibind}
 
 \newcommand{\quot}[1]{``#1''}
+\graphicspath{ {./images/} }
 
 \singlespacing
 \boldmath
@@ -36,7 +39,7 @@
 		\section{Background}
 		Artificial neural networks in all their various incarnations have been successfully used to solve a very wide range of machine learning problems, thanks to their good representational capabilities \cite{sharma2010constructive}.
 		
-		Theoretically, a simple feed-forward neural network with a single hidden layer and a sufficient number of neurons in that layer is an universal approximator \cite{hornik1989multilayer}. In practice however, too small networks may be unable to adequately learn the problem, while overly large networks tend to overfit the training data \cite{parekh2000constructive}.
+		Theoretically, a simple feed-forward neural network with a single hidden layer and a sufficient number of neurons in that layer is an universal approximator \cite{hornik1989multilayer,kuurkova1992kolmogorov}. In practice however, too small networks may be unable to adequately learn the problem, while overly large networks tend to overfit the training data \cite{parekh2000constructive}.
 		
 		The problem of determining the optimal neural network topology is thus very important. However, there are currently no efficient methods to choose \emph{a priori} the best network architecture for a given problem \cite{parekh2000constructive}. In real-world applications, \emph{trial-and-error} and decisions based on previous knowledge about the problem are often the preferred approach. The chosen architecture has thus no guarantees to be the optimal one for the task \cite{sharma2010constructive}.
 		
@@ -98,14 +101,42 @@
 	
 	\chapter{Literature Review}
 		\section{Artificial Neural Networks}
-		\begin{itemize}
-			\item General definition.
-			\item What are they able to do, theoretically and practically.
-			\item Composition of the network, layers etc.
-		\end{itemize}
+		\emph{Artificial neural networks} are a model designed to mimic the way in which the brain performs a task, usually simulated in software on a computer. Neural networks are parallel machines built upon simple, massively interconnected computing cells called \emph{neurons} (figure~\ref{fig:multilayer}). Every connection between nodes (\emph{synapse}) has an associated \emph{weight} \cite{haykin2004comprehensive}.
 		
-			\subsection{Types of networks}
+		\begin{figure}[h]
+			\centering
+			\includegraphics[width=\textwidth]{multilayer}
+			\caption{Architecture of an artificial neural network with two hidden layers and a single output neuron \cite{theodoridis2008pattern}.}
+			\label{fig:multilayer}
+		\end{figure}		
+		
+		The way in which neural networks are usually programmed to perform a function is through a process of \emph{learning}, which typically involves modifying the synaptic weights in such a way as to attain the desired objective \cite{haykin2004comprehensive}. As will be analysed in section~\ref{sec:constructive}, learning is not limited to that, as it is also possible for neural networks to modify their own topology, ability which is exploited by the current project.
+		
+		\newpage
+		
+		\begin{figure}[t]
+			\centering
+			\includegraphics[width=0.8\textwidth]{neuron}
+			\caption{Nonlinear model of a neuron \cite{haykin2004comprehensive}.}
+			\label{fig:neuron}
+		\end{figure}
+		
+		Figure~\ref{fig:neuron} shows a representation of a generic model of an artificial neuron. In detail, its main components are:
+		\begin{enumerate}
+			\item A set of \emph{synapses} or \emph{connecting links}, characterized by a \emph{weight} or \emph{strength}. If a signal $x_j£$ is at the input of a synapse $j$ connected to a neuron $k$, the input signal gets multiplied by the synaptic weight $w_{kj}$.
+			\item A \emph{sum} function which implements a \emph{linear combination} of the inputs with their respective synaptic weights.
+			\item An \emph{activation} or \emph{transfer} function which limits the amplitude of the output of the neuron, usually to the closed interval $\left[-1, 1\right]$. Nonlinear functions such as the \emph{sigmoid} are common choices.
+			\item Optionally, the model can include a value $b_k$ called \emph{bias}, whose role is to increase or lower the net input of the activation function. This is usually implemented by having an additional, fixed input $x_0 = 1$ multiplied by its respective weight $w_{k0}$ \cite{haykin2004comprehensive}.
+		\end{enumerate}
+		
+		Nodes in a network are usually grouped into three classes: an \emph{input layer}, whose neurons receive the information to be processed; an \emph{output layer}, which yield the results of the processing; and neurons in between organized in zero or more \emph{hidden layers} \cite{kotsiantis2007supervised}.
+		
+		The theoretical representational power of neural networks is well established in \cite{hornik1989multilayer} and \cite{kuurkova1992kolmogorov}: any continuous function can be implemented in a three-layer net, given sufficient number of hidden units, proper nonlinearities, and weights \cite{lam2015prslides}.
+		
+			\subsection{Network architectures}
 				\subsubsection{Feed-forward networks}
+				
+				
 				\subsubsection{Recurrent networks}
 				\subsubsection{Deep or hierarchical networks}
 		
@@ -130,6 +161,9 @@
 			\subsection{Predictive coding as biased competition}
 			\subsection{PC/BC--DIM}
 			
+		\section{Constructive Neural Networks}
+		\label{sec:constructive}
+
 	
 	\chapter{Main Result}
 		\section{Theoretical Development}

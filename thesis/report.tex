@@ -101,7 +101,7 @@
 	
 	\chapter{Literature Review}
 		\section{Artificial Neural Networks}
-		\emph{Artificial neural networks} are a model designed to mimic the way in which the brain performs a task, usually simulated in software on a computer. Neural networks are parallel machines built upon simple, massively interconnected computing cells called \emph{neurons} (figure~\ref{fig:multilayer}). Every connection between nodes (\emph{synapse}) has an associated \emph{weight} \cite{haykin2004comprehensive}.
+		\emph{Artificial neural networks} are a model designed to mimic the way in which the brain performs a task, usually simulated in software on a computer. Neural networks are parallel machines built upon simple, massively interconnected computing cells called \emph{neurons} (figure~\ref{fig:multilayer}). Every connection between nodes (\emph{synapse}) has an associated \emph{weight} \cite{haykin2009neural}.
 		
 		\begin{figure}[h]
 			\centering
@@ -110,34 +110,59 @@
 			\label{fig:multilayer}
 		\end{figure}		
 		
-		The way in which neural networks are usually programmed to perform a function is through a process of \emph{learning}, which typically involves modifying the synaptic weights in such a way as to attain the desired objective \cite{haykin2004comprehensive}. As will be analysed in section~\ref{sec:constructive}, learning is not limited to that, as it is also possible for neural networks to modify their own topology, ability which is exploited by the current project.
+		The way in which neural networks are usually programmed to perform a function is through a process of \emph{learning}, which typically involves modifying the synaptic weights in such a way as to attain the desired objective \cite{haykin2009neural}. As will be analysed in section~\ref{sec:constructive}, learning is not limited to that, as it is also possible for neural networks to modify their own topology, ability which is exploited by the current project.
 		
 		\newpage
 		
 		\begin{figure}[t]
 			\centering
-			\includegraphics[width=0.8\textwidth]{neuron}
-			\caption{Nonlinear model of a neuron \cite{haykin2004comprehensive}.}
+			\includegraphics[width=0.85\textwidth]{neuron}
+			\caption{Nonlinear model of a neuron \cite{haykin2009neural}.}
 			\label{fig:neuron}
 		\end{figure}
 		
 		Figure~\ref{fig:neuron} shows a representation of a generic model of an artificial neuron. In detail, its main components are:
 		\begin{enumerate}
 			\item A set of \emph{synapses} or \emph{connecting links}, characterized by a \emph{weight} or \emph{strength}. If a signal $x_j£$ is at the input of a synapse $j$ connected to a neuron $k$, the input signal gets multiplied by the synaptic weight $w_{kj}$.
-			\item A \emph{sum} function which implements a \emph{linear combination} of the inputs with their respective synaptic weights.
-			\item An \emph{activation} or \emph{transfer} function which limits the amplitude of the output of the neuron, usually to the closed interval $\left[-1, 1\right]$. Nonlinear functions such as the \emph{sigmoid} are common choices.
-			\item Optionally, the model can include a value $b_k$ called \emph{bias}, whose role is to increase or lower the net input of the activation function. This is usually implemented by having an additional, fixed input $x_0 = 1$ multiplied by its respective weight $w_{k0}$ \cite{haykin2004comprehensive}.
+			\item A \emph{sum} function $\Sigma$ which implements a \emph{linear combination} of the inputs with their respective synaptic weights.
+			\item An \emph{activation} or \emph{transfer} function $\varphi$ which limits the amplitude of the output of the neuron, usually to the closed interval $[-1, 1]$. Nonlinear functions such as the \emph{sigmoid} are common choices.
+			\item Optionally, the model can include a value $b_k$ called \emph{bias}, whose role is to increase or lower the net input of the activation function. This is usually implemented by having an additional, fixed input $x_0 = 1$ multiplied by its respective weight $w_{k0}$ \cite{haykin2009neural}.
 		\end{enumerate}
+		
+		Mathematically, the behaviour of a neuron can be described by the following equations:
+		\begin{equation}
+			v_k = \sum_{j=0}^{m} w_{kj}x_j
+		\end{equation}
+		\begin{equation}
+			y_k = \varphi(v_k)
+		\end{equation}
 		
 		Nodes in a network are usually grouped into three classes: an \emph{input layer}, whose neurons receive the information to be processed; an \emph{output layer}, which yield the results of the processing; and neurons in between organized in zero or more \emph{hidden layers} \cite{kotsiantis2007supervised}.
 		
-		The theoretical representational power of neural networks is well established in \cite{hornik1989multilayer} and \cite{kuurkova1992kolmogorov}: any continuous function can be implemented in a three-layer net, given sufficient number of hidden units, proper nonlinearities, and weights \cite{lam2015prslides}.
+		The representational power of neural networks is well defined theoretically: in fact, any continuous function can be implemented in a three-layer net, given sufficient number of hidden units, proper nonlinearities, and weights \cite{hornik1989multilayer,kuurkova1992kolmogorov,lam2015prslides}.
 		
 			\subsection{Network architectures}
-				\subsubsection{Feed-forward networks}
-				Feed-forward networks allow signals to travel only one way, from input to output \cite{kotsiantis2007supervised}. This layout is thus strictly acyclic \cite{haykin2004comprehensive}.
+				\subsubsection{Feedforward networks}
+				The simplest type of topology is the feedforward network, which allows signals to travel only one way, from input to output \cite{kotsiantis2007supervised}; this layout is thus strictly acyclic. The signals resulting from the input layer are fed to the second layer, and so on till the final layer, whose output constitutes the overall response of the network to the source pattern \cite{haykin2009neural}.
+				
+				\begin{figure}[h]
+					\centering
+					\includegraphics[width=0.6\textwidth]{feedforward}
+					\caption{Fully connected feedforward neural network \cite{haykin2009neural}.}
+					\label{fig:feedforward}
+				\end{figure}
+				
+				Typically (but not necessarily) the neurons in each layer are only connected to the ones into the immediately following layer. If every node in each layer is connected to every other node in the adjacent layer, the neural network is said to be \emph{fully connected} (respectively \emph{partially connected}) \cite{haykin2009neural}. Figure~\ref{fig:feedforward} shows an example of such a network.
 				
 				\subsubsection{Recurrent networks}
+				Contrarily to feedforward networks, \emph{recurrent} neural networks have at least one \emph{feedback} loop. Feedback is present in a system when the output of an element influences (at least in part), the input applied to that same element.
+				\begin{figure}[b]
+					\centering
+					\includegraphics[width=0.9\textwidth]{recurrent}
+					\caption{Recurrent neural network with hidden neurons \cite{haykin2009neural}.}
+					\label{fig:recurrent}
+				\end{figure}
+				
 				\subsubsection{Deep or hierarchical networks}
 		
 			\subsection{Training algorithms}

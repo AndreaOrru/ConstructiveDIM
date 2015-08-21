@@ -37,7 +37,7 @@
 	\chapter{Introduction}
 		\nomenclature{y}{A very cool variable.}
 		\section{Background}
-		Artificial neural networks in all their various incarnations have been successfully used to solve a very wide range of machine learning problems, thanks to their good representational capabilities \cite{sharma2010constructive}.
+		Artificial neural networks in all their various incarnations have been successfully employed to solve a very wide range of machine learning problems, thanks to their good representational capabilities \cite{sharma2010constructive}.
 		
 		Theoretically, a simple feed-forward neural network with a single hidden layer and a sufficient number of neurons in that layer is an universal approximator \cite{hornik1989multilayer,kuurkova1992kolmogorov}. In practice however, too small networks may be unable to adequately learn the problem, while overly large networks tend to overfit the training data \cite{parekh2000constructive}.
 		
@@ -161,17 +161,29 @@
 					\caption{Recurrent neural network with hidden neurons \cite{haykin2009neural}.}
 					\label{fig:recurrent}
 				\end{figure}
-				Contrarily to feedforward networks, \emph{recurrent} neural networks have at least one \emph{feedback} loop. Feedback is present in a system when the output of an element influences (at least in part), the input applied to that same element. The presence of feedback loops has a deep impact on the learning capabilities of recurrent neural networks \cite{haykin2009neural}. They are general computers, much more powerful than simple feedforward networks; for example, they have the ability to predict element in sequ
-				ences on the basis of their predecessors \cite{cleeremans1993mechanisms}.
+				Contrarily to feedforward networks, \emph{recurrent} neural networks have at least one \emph{feedback} loop. Feedback is present in a system when the output of an element influences (at least in part), the input applied to that same element \cite{haykin2009neural}; connections among its neurons thus contribute to form a directed cycle in the topology \cite{yu2015recurrent}. The presence of these cycles has a deep impact on the learning capabilities of recurrent neural networks \cite{haykin2009neural}. The topology employed by the DIM algorithm makes use of feedback loops (see section~\ref{sec:negfeedback}).
+				
+				Recurrent networks are general computers, much more powerful than simple feedforward ones \cite{schmidhuber2015deep}; in fact, cycles account for the creation of an internal state which allows them to deal with temporal behaviour \cite{yu2015recurrent}. As a significant example, they have the ability to both create and recognize sequences of input patterns \cite{cleeremans1993mechanisms,pearlmutter1990dynamic}.
 				
 				\subsubsection{Deep networks}
-				A deep neural network is a neural network with multiple hidden layers. The main idea behind this is that the extra layers enable composition of features from lower layers, enabling them to model complex data at a higher level of abstraction \cite{bengio2009learning,schmidhuber2015deep}. 
+				A \emph{deep} neural network is a neural network with multiple hidden layers. Even though, theoretically, \emph{shallow} (as opposed as deep) networks have the ability to represent every kind of function, in practice recent findings indicate that \emph{deep architectures} may be better suited to the task of representing some complicated functions (e.g. as those found in vision and language). Specifically, \emph{\quot{functions that can be compactly represented by a depth $k$ architecture might require an exponential number of computational elements to be represented by a depth $k - 1$ architecture}} \cite{bengio2009learning}.
+				
+				The main reason behind that and the motivation for deep networks is that those complex behaviours are modelled by mathematical functions which are highly nonlinear in terms of the input signals. The statistical relationships governing that extreme variability may be to complex and not readily deductible at that level. Therefore each hidden layer of the deep network is assigned with the task of extracting \emph{features} from the previous stage, in this way transforming the original input into increasingly more abstract representations \cite{bengio2009learning}.
+				
+				The PC/BC model on which the project is based (described in section~\ref{sec:pcbc}) in its general, hierarchical form can be considered a case of deep network.
 		
-			\subsection{Training algorithms}
-				\subsubsection{Supervised learning}
-				\subsubsection{Unsupervised learning}
+			\subsection{Classes of training algorithms}
+				The process of learning can be categorized in three distinct classes: \emph{supervised}, \emph{unsupervised}, and \emph{reinforcement learning}.
+				
+				In \emph{supervised learning}, training is performed on the basis of a set of input-output examples provided from an external source of knowledge. Input vectors are fed to the network and the resulting output is compared with the expected one; then, through a process called \emph{error-correction}, the weights of the network are modified in such a way as to minimize the error between the expected outcome and the actual output \cite{haykin2009neural}.
+				
+				In \emph{unsupervised learning}, no examples are provided and the training algorithm has to rely on a task-indipendent measure which quantifies the quality of the representation. The network is thus optimized with respect to that measure. Most unsupervised algorithms achieve training through \emph{competition} \cite{spratling2009unsupervised}: in this case, an input layer of neurons sends activations to a competitive layer, whose neurons compete for the chance to respond to features in the data. Therefore nodes which represent features in the data are made more likely to activate, according to a certain rule \cite{haykin2009neural}. Negative feedback networks (presented in section~\ref{sec:negfeedback}) employed by the DIM algorithm are an example of a model that provides competition.
+				
+				In \emph{reinforcement learning}, the network learns through interaction with the \emph{environment}: the result of the output is evaluated and the network is updated to minimize an \emph{index of performance}.	
+				
 		
 		\section{Negative Feedback Networks}
+		\label{sec:negfeedback}
 		The main idea.
 			\subsection{Fyfe's Network}
 			\subsection{Harpur's Network}
@@ -184,6 +196,7 @@
 		This.
 
 		\section{PC/BC}
+		\label{sec:pcbc}
 			\subsection{Predictive coding}
 			\subsection{Predictive coding as biased competition}
 			\subsection{PC/BC--DIM}

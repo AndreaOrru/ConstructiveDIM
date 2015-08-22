@@ -31,9 +31,9 @@
 	\addcontentsline{toc}{chapter}{Acknowledgements}
 	I would like to express my appreciation to professor \textbf{Spratling}, my supervisor, for his never-ending patience and availability when guiding me towards the completion of this project.
 	
-	I will never be able to thank my best friend \textbf{Claudio} enough, as I would have never got this far without him. But I want to try anyway: thank you for all the chatting, the laughs, the \emph{pasta parties}, and the advices, the insights, the constant inspiration. Most of all, thank you for being there all the time, making the fun moments enjoyable and the terrible ones bearable. You never failed me: your loyalty redefined my whole concept of friendship. \emph{I owe you a life debt}.
+	I will never be able to thank my best friend \textbf{Claudio} enough, as I would have never got this far without him. But I want to try anyway: thank you for all the chatting, the laughs, the \emph{pasta parties}, and the advices, the insights, the constant inspiration. Most of all, thank you for being there all the time, making the good moments memorable and the terrible ones bearable. You never failed me: your loyalty redefined my whole concept of friendship. \emph{I owe you a life debt}.
 	
-	Infinite thanks to \textbf{Chiara}, \emph{the other side of my brain}, the girl that knows what I will be thinking before I even have the time to think it myself, the only person I know that can take the big mess I am, make some sense out of it, and sometimes even fix it: \emph{you truly are unique}.
+	Infinite thanks to \textbf{Chiara}, \emph{the other side of my brain}, the girl that knows what I will be thinking before I even have the time to think it myself, the only person I know that can take the big mess I am, make some sense out of it, and sometimes even fix it. \emph{You truly are unique}.
 	
 	Thanks to \textbf{Francesco}, the demi-god (\emph{son of Zeus} maybe?) who is apparently never tired of listening to me, who brought me here in the first place and who helped me become the person I am today. Without you, there would have been no Master at all!
 	
@@ -43,7 +43,7 @@
 	
 	Eternal gratitude to \textbf{my family}, for all the support they gave me and all the sacrifices they endured to make this year possible. Thank you for your trust, I will find a way to make you proud, \emph{I promise}.
 	
-	Finally, \textbf{Eva}. \emph{For the happiest days of my life}.
+	Finally, \textbf{Eva}. For \emph{the happiest days of my life}.
 	
 	
 	\renewcommand*\contentsname{Table of Contents}
@@ -234,7 +234,7 @@
 			\begin{equation}
 				W \leftarrow W + \beta y e^T
 			\end{equation}
-			Where $y = [y_1, ..., y_n]^T$ represents the vector of the outputs, $x = [x_1, ..., x_m]^T$ the vector of inputs, $W = [w_1, ..., w_n]^T$ an $n$ by $m$ matrix of weights, with each row containing the weights received by a single nodes, and $e$ is the vector of inhibited inputs\footnote{As explained in the introduction (section~\ref{sec:background}), inhibited inputs can be equivalently interpreted as representing the \emph{reconstruction error} of the network, without any changes to the mathematical model \cite{spratling2009unsupervised}.}.
+			Where $y = [y_1, ..., y_n]^T$ represents the vector of the outputs,\\$x = [x_1, ..., x_m]^T$ the vector of inputs, $W = [w_1, ..., w_n]^T$ an $n$ by $m$ matrix of weights, with each row containing the weights received by a single nodes, and $e$ is the vector of inhibited inputs\footnote{As explained in the introduction (section~\ref{sec:background}), inhibited inputs can be equivalently interpreted as representing the \emph{reconstruction error} of the network, without any changes to the mathematical model \cite{spratling2009unsupervised}.}.
 			
 			The third equation describes the training rule, where $\beta$ is a parameter known as \emph{learning rate}. As it can be seen from all the equations, the inhibited inputs only influence the learning phase and not the output of the network directly, so this model does not fully implement competition which, in the application we are concerned of, results in the inability of the network to correctly represent the input, even when the weights have been correctly learned.
 				

@@ -1,5 +1,7 @@
 \documentclass[11pt,a4paper]{report}
 
+\usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage[titletoc]{appendix}
 \usepackage{color}
 \usepackage{float}
@@ -31,31 +33,30 @@
 	\addcontentsline{toc}{chapter}{Acknowledgements}
 	I would like to express my appreciation to professor \textbf{Spratling}, my supervisor, for his never-ending patience and availability when guiding me towards the completion of this project.
 	
-	I will never be able to thank my best friend \textbf{Claudio} enough, as I would have never got this far without him. But I want to try anyway: thank you for all the chatting, the laughs, the \emph{pasta parties}, and the advices, the insights, the constant inspiration. Most of all, thank you for being there all the time, making the good moments memorable and the terrible ones bearable. You never failed me: your loyalty redefined my whole concept of friendship. \emph{I owe you a life debt}.
+	I will never be able to thank my best friend \textbf{Claudio} enough, as I would have never got this far without him. But I want to try anyway: thank you for all the chatting, the laughs, the \emph{pasta parties}, and the advices, the insights, the constant inspiration. Most of all, thank you for being there all the time, making the good moments memorable and the terrible ones bearable. You never failed me: your loyalty redefined my whole concept of friendship. I owe you a life debt.
 	
-	Infinite thanks to \textbf{Chiara}, \emph{the other side of my brain}, the girl that knows what I will be thinking before I even have the time to think it myself, the only person I know that can take the big mess I am, make some sense out of it, and sometimes even fix it. \emph{You truly are unique}.
+	Infinite thanks to \textbf{Chiara}, \emph{the other side of my brain}, the girl that knows what I will be thinking before I even have the time to think it myself, the only person I know that can take the big mess I am, make some sense out of it, and sometimes even fix it. You truly are unique.
 	
-	Thanks to \textbf{Francesco}, the demi-god (\emph{son of Zeus} maybe?) who is apparently never tired of listening to me, who brought me here in the first place and who helped me become the person I am today. Without you, there would have been no Master at all!
+	Cheers to \textbf{Riccardo}: if there ever was a turning point in my life, that was following you in that crazy adventure that begun one year ago and, I hope, will never end. You and I discovered the meaning of life, and is there anything more important than that?
 	
-	Special thanks to \textbf{Riccardo}: If there ever was a turning point in my life, that was following you in that crazy adventure that begun one year ago and, I hope, will never end. You and I discovered \emph{the meaning of life}, and is there anything more important than that?
+	Special thanks to \textbf{Francesco}, the demi-god (\emph{son of Zeus} maybe?) who is apparently never tired of listening to me, who brought me here in the first place and who helped me become the person I am today. Without you, there would have been no Master at all!
 	
 	Thanks to \textbf{Sid}, hero of the late-nighters and companion in \emph{deadline-induced panic}. Thanks to \textbf{Gabriele} for all the encouragement. To \textbf{Andrea}, because \emph{ertu}. To the yellow \textbf{Luana}. To that crazy dude that is \textbf{Nic}. To my \emph{sadmate} \textbf{Myria}. And to \textbf{Melisa} (\emph{daaarling!}).
 	
-	Eternal gratitude to \textbf{my family}, for all the support they gave me and all the sacrifices they endured to make this year possible. Thank you for your trust, I will find a way to make you proud, \emph{I promise}.
+	Eternal gratitude to \textbf{my family}, for all the support they gave me and all the sacrifices they endured to make this year possible. Thank you for your trust, I will find a way to make you proud, I promise.
 	
-	Finally, \textbf{Eva}. For \emph{the happiest days of my life}.
+	Finally, \textbf{Eva}. For the happiest days of my life.
 	
 	
 	\renewcommand*\contentsname{Table of Contents}
 	\tableofcontents
 
-	\printnomenclature
+	\printnomenclature[0.7in]
 	\listoffigures
 	\listoftables
 	
 	
 	\chapter{Introduction}
-		\nomenclature{y}{A very cool variable.}
 		\section{Background}
 			\label{sec:background}
 			Artificial neural networks in all their various incarnations have been successfully employed to solve a very wide range of machine learning problems, thanks to their good representational capabilities \cite{sharma2010constructive}.
@@ -256,16 +257,128 @@
 				The parameter $\mu$ has to be carefully chosen: big values will cause some elements of $y$ to grow too large in a single step, causing the values in $e$ responsible for the activation of those elements to decrease, and so on. Output values thus oscillate without reaching a steady-state. For this reason, $\mu$ has to be small, which however causes $y$ to be updated slowly, thus requiring many iterations to achieve convergence \cite{spratling2009unsupervised}.
 	
 		\section{Non-negative Matrix Factorisation}
-		Image decomposition, main algorithm
+			\nomenclature{NMF}{Non-negative Matrix Factorisation.}
+			Non-negative matrix factorisation is a method to find two factors $W^T$ and $Y$ of a non-negative matrix $X$  \cite{spratling2009unsupervised}, such that:
+			\begin{equation}
+				X \approx W^T Y
+			\end{equation}
+			\begin{equation}
+				\begin{split}
+					W \nless 0 \\
+					Y \nless 0
+				\end{split}
+			\end{equation}
+			Since image components are non-negative, theoretically this is a suitable method to find parts-based decomposition of images \cite{feng2002local}. 
+			
+			If $m$ is the size of the images, $n$ is the number of possible image components, and $p$ is the number of images in the training set, then:
+			\begin{itemize}
+				\item $X = [x_1, ..., x_p]$ is an $m \times p$ matrix, with each column containing the pixels of a training image.
+				\item $W^T$ is an $m \times n$ matrix of weight values, with each column being a component (or basis vector) into which an image can be decomposed.
+				\item $Y = [y_1, ..., y_p]$ is an $n \times\ p$ matrix, with each column describing the activation of each component in the corrisponding training image.
+			\end{itemize}
+			An individual training image can be reconstructed as:
+			\begin{equation}
+				x_k \approx W^T y_k
+			\end{equation}
+
+			Non-negative matrix factorisation shares mathematical similarity with negative feedback neural networks. In particular, NMF can be seen as a \emph{divisory form} of feedback inhibition. However, the main difference is that NMF operates in batch mode, while negative feedback neural network is an on-line algorithm \cite{spratling2009unsupervised}. There exists a number of algorithms to approximate the solutions for that equation. Even so, all of them operate on all the training data at once.
+			
 			\subsection{Sequential version}
+			In analogy to negative feedback networks, the term
+			\begin{equation*}
+				E = X \oslash (W^T Y)
+			\end{equation*}
+			which measures the residual error in the reconstruction of $X$, can be introduced. By performing the relevant substitutions and on the basis of some simplifying assumptions (detailed in \cite{spratling2009unsupervised}), the formulas can be rewritten and iterative rules for the vectors relative to a single training image (written in lowercase) can be derived:
+			\begin{equation}
+				\label{eq:nmf_error}
+				e = x \oslash (\epsilon + W^T y)
+			\end{equation}
+			\begin{equation}
+				y \leftarrow (\epsilon + y) \otimes (We) \oslash \tilde{w}
+			\end{equation}
+			\begin{equation}
+				W \leftarrow W \otimes (1 + \beta y (e^T - 1))
+			\end{equation}
+			Where $\tilde{w}$ is a column vector each element of which represents the total synaptic weight received by one output node.
+			
+			Comparing equation~\ref{eq:nmf_error} with equation~\ref{eq:harpur_error}, the similarity between NMF and negative feedback networks is obvious: specifically, NMF implements a divisive, rather than subtractive, feedback.
+			
+			In contrast to Fyfe's networks, sequential NMF provides competition between the nodes of the network. Moreover, the resulting algorithm is more stable than Harpur's algorithm \cite{spratling2009unsupervised}.
 	
-		\section{Divisive Input Modulation}
-		This.
+		\newpage
 
 		\section{PC/BC}
-		\label{sec:pcbc}
+			\nomenclature{PC/BC}{Predictive Coding as Biased Competition.}
+			\label{sec:pcbc}
 			\subsection{Predictive coding}
+				\begin{figure}[h]
+					\centering
+					\includegraphics[scale=0.6]{prediction}
+					\caption{A graphical representation of a pair of adjacent populations in the PC model. \cite{spratling2014predictive}.}
+					\label{fig:predictive}
+				\end{figure}
+				
+				Predictive coding is commonly used to model information processing in cerebral cortex. It is typically implemented as hierarchical neural networks
+				with alternating populations of error-detecting and prediction neurons. Prediction neurons' activity produces a reconstruction of the inputs
+				via feedback connections to the preceding error-detecting neurons; error-detecting neurons calculate the residual error between
+				the reconstructed and actual inputs \cite{spratling2014predictive}.
+
 			\subsection{Predictive coding as biased competition}
+				\begin{figure}[h]
+					\centering
+					\includegraphics[scale=0.4]{pcbc}
+					\caption{A graphical representation of the PC/BC model \cite{spratling2008predictive}.}
+					\label{fig:pcbc}
+				\end{figure}
+				
+				PC/BC is an alternative model that uses direct excitatory feedback from one population of prediction nodes to the preceding one \cite{spratling2008predictive}.
+				Activation rules for a PC/BC model as the one in figure~\ref{fig:pcbc} implemented as a hierarchical neural network are as follows:
+				
+				$$e^{Si} = G(y^{Si-1}) \oslash [\epsilon_2 + (V^{Si})^T y^{Si}]$$
+				$$y^{Si} \leftarrow (\epsilon_1 + y^{Si}) \otimes W^{Si}e^{Si} \otimes [1 + \eta G((U^{Si+1}))^T y^{Si+1}]$$
+				
+				Where:
+				\begin{itemize}
+					\item $Si$ indicates the stage $i$ of the hierarchical network.
+					\item $e^{Si}$ is a $m \times 1$ vector of error-detecting neuron activations.
+					\item $y^{Si}$ is a $n \times 1$ vector of prediction neuron activations.
+					\item $W^{Si}$, $V^{Si}$, $U^{Si}$ are $n \times m$ matrces of synaptic weights.
+					\item $\epsilon_1$, $\epsilon_2$, $\eta$ are parameters.
+					\item $G$ is a function that clips values at 1. 
+				\end{itemize}
+				
+				In the first equation, the first term represent the actual input, while the second term represents the reconstructed input from the prediction neurons.
+				
+				In the second equation, the first term represents the previous value of $y^{Si}$, the second term is the feedforward input from error-detecting neurons to prediction ones, and
+				the third term represents the modulation coming from the top-down predicitions of the next stage, if any.
+				
+		\section{Divisive Input Modulation}
+			\nomenclature{DIM}{Divisive Input Modulation.}
+			Notwithstanding the improvements of the sequential NMF algorithm compared to Fyfe and Harpur's networks, the former still suffers from a weakness that makes it poor at learning image components when overlapping between components is present in the training images \cite{spratling2009unsupervised}.
+			
+			\begin{figure}[h]
+				\centering
+				\includegraphics[width=0.85\textwidth]{nmf_problem}
+				\caption{\cite{spratling2009unsupervised}}
+				\label{fig:nmf_problem}
+			\end{figure}	
+					
+			The problem is illustrated by figure~\ref{fig:nmf_problem}. Intuitively, one might expect that as the strengths of the weights increase, so would the response of the output node. In sequential NMF however, as the weights increase the output node inhibits the input it receives more strongly, and the response actually decreases. To fix this behaviour, Spratling \cite{spratling2009unsupervised} proposes an algorithm called \emph{Divisive Input Modulation}, which is the one on which the current project is based on. The algorithm makes use of the following equations:
+			\begin{equation}
+				e = x \oslash (\epsilon + \hat{W}^T y)
+			\end{equation}
+			\begin{equation}
+				y \leftarrow (\epsilon + y) \otimes We
+			\end{equation}
+			\begin{equation}
+				W \leftarrow W \otimes (1 + \beta y (e^T - 1))
+			\end{equation}
+			Where $\hat{W}$ is a matrix representing the same synaptic weight values as $W$ but with rows normalised to have a maximum value of 1, and $\epsilon$ is a small constant used to prevent division-by-zero errors. Following learning, weights are clipped at zero.
+			
+			\textcolor{red}{Expand on why the problem is fixed.}
+			
+			Divisive Input Modulation showed results superior to existing methods in learning image components, especially in the presence of occlusion and overlapping \cite{spratling2009unsupervised}.
+			
 			\subsection{PC/BC--DIM}
 			
 		\section{Constructive Neural Networks}

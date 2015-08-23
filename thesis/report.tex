@@ -39,7 +39,7 @@
 	
 	Special thanks to \textbf{Riccardo}: If there ever was a turning point in my life, that was following you in that crazy adventure that begun one year ago and, I hope, will never end. You and I discovered \emph{the meaning of life}, and is there anything more important than that?
 	
-	Thanks to \textbf{Sid}, hero of the late-nighters and companion in \emph{deadline-induced panic}. Thanks to \textbf{Andrea}, because \emph{ertu}. To the yellow \textbf{Luana}. To that crazy dude that is \textbf{Nic}. And to \textbf{Melisa} (\emph{daaarling!}).
+	Thanks to \textbf{Sid}, hero of the late-nighters and companion in \emph{deadline-induced panic}. Thanks to \textbf{Gabriele} for all the encouragement. To \textbf{Andrea}, because \emph{ertu}. To the yellow \textbf{Luana}. To that crazy dude that is \textbf{Nic}. To my \emph{sadmate} \textbf{Myria}. And to \textbf{Melisa} (\emph{daaarling!}).
 	
 	Eternal gratitude to \textbf{my family}, for all the support they gave me and all the sacrifices they endured to make this year possible. Thank you for your trust, I will find a way to make you proud, \emph{I promise}.
 	
@@ -213,32 +213,47 @@
 			Negative feedback networks are a model for unsupervised learning in which competition is achieved, rather than by lateral \emph{inhibition} (where nodes influence the output of other nodes), by inhibiting the inputs of the competing nodes. In this kind of networks, the activation of the output nodes is \emph{fed back} to their inputs and subtracted, effectively implementing the competition \cite{spratling2009unsupervised}, as in the example shown in figure~\ref{fig:negfeedback}.
 		
 			\subsection{Fyfe's Network}
-			One good example of negative feedback network algorithm is the one described by Fyfe and his colleagues in \cite{charles1997discovering,charles1998modelling,charles2002unsupervised,fyfe1997neural}. These networks are based on the initial assumption that both weights and outputs can not be negative; constraints are thus set so that, if that happens, they are instead set to zero. The motivations behind this are that (1) the kind of data that is presented to the network will always be positive, so it is reasonable to expect the activity in the network to be positive as well, and (2) synapses in the brain are not believed to be able to change from excitatory to inhibitory \cite{charles1998modelling}.
+				One good example of negative feedback network algorithm is the one described by Fyfe and his colleagues in \cite{charles1997discovering,charles1998modelling,charles2002unsupervised,fyfe1997neural}. These networks are based on the initial assumption that both weights and outputs can not be negative; constraints are thus set so that, if that happens, they are instead set to zero. The motivations behind this are that (1) the kind of data that is presented to the network will always be positive, so it is reasonable to expect the activity in the network to be positive as well, and (2) synapses in the brain are not believed to be able to change from excitatory to inhibitory \cite{charles1998modelling}.
 
-			\newpage
+				\newpage
 
-			\begin{figure}[h]
-				\centering
-				\includegraphics[width=0.3\textwidth]{basictopology}
-				\caption{Two-node, two-input neural network with inhibitory feedback. Excitatory synapses are shown as arrows while inhibitory ones as filled circles \cite{spratling2009unsupervised}. This is the basic form of all the model on which the algorithms involved in the project are based.}
-				\label{fig:basictopology}
-			\end{figure}
+				\begin{figure}[h]
+					\centering
+					\includegraphics[width=0.3\textwidth]{basictopology}
+					\caption{Two-node, two-input neural network with inhibitory feedback. Excitatory synapses are shown as arrows while inhibitory ones as filled circles \cite{spratling2009unsupervised}. This is the basic form of all the model on which the algorithms involved in the project are based.}
+					\label{fig:basictopology}
+				\end{figure}
 
-			If the network has $m$ inputs and $n$ competing nodes, then the equations regulating the activity of the networks are as following:
-			\begin{equation}
-				y = Wx
-			\end{equation}
-			\begin{equation}
-				e = x - W^Ty
-			\end{equation}
-			\begin{equation}
-				W \leftarrow W + \beta y e^T
-			\end{equation}
-			Where $y = [y_1, ..., y_n]^T$ represents the vector of the outputs,\\$x = [x_1, ..., x_m]^T$ the vector of inputs, $W = [w_1, ..., w_n]^T$ an $n$ by $m$ matrix of weights, with each row containing the weights received by a single nodes, and $e$ is the vector of inhibited inputs\footnote{As explained in the introduction (section~\ref{sec:background}), inhibited inputs can be equivalently interpreted as representing the \emph{reconstruction error} of the network, without any changes to the mathematical model \cite{spratling2009unsupervised}.}.
+				If the network has $m$ inputs and $n$ competing nodes, then the equations regulating the activity of the networks are as following:
+				\begin{equation}
+					y = Wx
+				\end{equation}
+				\begin{equation}
+					e = x - W^Ty
+				\end{equation}
+				\begin{equation}
+					W \leftarrow W + \beta y e^T
+				\end{equation}
+				Where $y = [y_1, ..., y_n]^T$ represents the vector of the outputs,\\$x = [x_1, ..., x_m]^T$ the vector of inputs, $W = [w_1, ..., w_n]^T$ an $n$ by $m$ matrix of weights, with each row containing the weights received by a single nodes, and $e$ is the vector of inhibited inputs\footnote{As explained in the introduction (section~\ref{sec:background}), inhibited inputs can be equivalently interpreted as representing the \emph{reconstruction error} of the network, without any changes to the mathematical model \cite{spratling2009unsupervised}.}.
 			
-			The third equation describes the training rule, where $\beta$ is a parameter known as \emph{learning rate}. As it can be seen from all the equations, the inhibited inputs only influence the learning phase and not the output of the network directly, so this model does not fully implement competition which, in the application we are concerned of, results in the inability of the network to correctly represent the input, even when the weights have been correctly learned.
+				The third equation describes the training rule, where $\beta$ is a parameter known as \emph{learning rate}. As it can be seen from all the equations, the inhibited inputs only influence the learning phase and not the output of the network directly, so this model does not fully implement competition which, in the application we are concerned of, results in the inability of the network to correctly represent the input, even when the weights have been correctly learned.
 				
 			\subsection{Harpur's Network}
+				Harpur proposes a different algorithm based on the same model \cite{harpur1994fast,harpur1996development,harpur1997low} which does provide competition which influences the network output directly. The equations describing its behaviour are the following:
+				\begin{equation}
+					\label{eq:harpur_error}
+					e = x - W^Ty
+				\end{equation}
+				\begin{equation}
+					\label{eq:harpur_output}
+					y \leftarrow y + \mu W e
+				\end{equation}
+				\begin{equation}
+					W \leftarrow W + \beta y e^T
+				\end{equation}
+				As it can be seen, the learning rule is the same of the one used by Fyfe's algorithm. Note that weights are clipped to be in the range $[0,1]$. What is different from the previous case is how the values for $y$ and $e$ are calculated. First, and for each new input image, $y$ is initialized to zero; then equations \ref{eq:harpur_error} and \ref{eq:harpur_output} are iterated until they converge to the final value. Negative values of $y$ are clipped to zero at every iteration.
+				
+				The parameter $\mu$ has to be carefully chosen: big values will cause some elements of $y$ to grow too large in a single step, causing the values in $e$ responsible for the activation of those elements to decrease, and so on. Output values thus oscillate without reaching a steady-state. For this reason, $\mu$ has to be small, which however causes $y$ to be updated slowly, thus requiring many iterations to achieve convergence \cite{spratling2009unsupervised}.
 	
 		\section{Non-negative Matrix Factorisation}
 		Image decomposition, main algorithm

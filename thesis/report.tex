@@ -59,6 +59,7 @@
 	\chapter{Introduction}
 		\section{Background}
 			\label{sec:background}
+			\nomenclature{ANN}{Artificial Neural Network}
 			Artificial neural networks in all their various incarnations have been successfully employed to solve a very wide range of machine learning problems, thanks to their good representational capabilities \cite{sharma2010constructive}.
 		
 			Theoretically, a simple feed-forward neural network with a single hidden layer and a sufficient number of neurons in that layer is an universal approximator \cite{hornik1989multilayer,kuurkova1992kolmogorov}. In practice however, too small networks may be unable to adequately learn the problem, while overly large networks tend to overfit the training data \cite{parekh2000constructive}.
@@ -75,7 +76,7 @@
 		
 			\newpage
 		
-			In the present project I worked on the development of a constructive version of the DIM\footnote{Divisive Input Modulation.} learning algorithm, as described in \cite{spratling2009unsupervised}, and its derivation \cite{spratling2012unsupervised} used in the \emph{non-linear} PC/BC model\footnote{Predictive Coding as Biased Competition} \cite{spratling2008predictive}. The original algorithm has been developed to train a variation of \emph{negative feedback networks} and has proven to be very successful in the unsupervised learning of image components, yielding state-of-the-art performances in various benchmarks, even in the presence of occlusion and overlapping \cite{spratling2009unsupervised}.
+			In the present project I worked on the development of a constructive version of the DIM\footnote{Divisive Input Modulation.} learning algorithm, as described in \cite{spratling2009unsupervised}, and its derivation \cite{spratling2012unsupervised} used in the \emph{non-linear} PC/BC model\footnote{Predictive Coding as Biased Competition.} \cite{spratling2008predictive}. The original algorithm has been developed to train a variation of \emph{negative feedback networks} and has proven to be very successful in the unsupervised learning of image components, yielding state-of-the-art performances in various benchmarks, even in the presence of occlusion and overlapping \cite{spratling2009unsupervised}.
 		
 			On one hand, the main feature of negative feedback networks is the competition between nodes, which enables them to be selective for different input stimuli by making the individual synaptic weights more distinct. This is achieved by having inhibiting (\emph{divisive}) feedback connections from the output neurons back to their input nodes \cite{spratling2009unsupervised}. 
 		
@@ -87,9 +88,9 @@
 				\item Talk about the dictionary approach? (very briefly?)
 			\end{itemize}
 
-			A connection can be drawn between these two models. If we consider negative feedback networks from an equivalent perspective, namely a generative one, it can be shown that the higher level of the network produces a \emph{reconstruction} of the input via the feedback connections; while feedforward connections instead convey \emph{residual error} between the top-down prediction and the bottom-up input \cite{spratling2009unsupervised}, much like in the PC model. Symmetrically, \emph{Predictive Coding} can be redefined as a form of \emph{Biased Competition} \cite{spratling2008predictive}.
+			A connection can be drawn between these two models. If we consider negative feedback networks from an equivalent perspective, namely a generative one, it can be shown that the higher level of the network produces a \emph{reconstruction} of the input via the feedback connections; while feedforward connections instead convey \emph{residual error} between the top-down prediction and the bottom-up input \cite{spratling2009unsupervised}, much like in the PC model. Symmetrically, \emph{Predictive Coding} can be redefined as a form of \emph{Biased Competition} \cite{spratling2008predictive,spratling2008reconciling}.
 		
-			Algorithms that work for one model can thus be adapted to work for the other one. In particular, PC/BC networks trained using the DIM algorithm are referred to as PC/BC--DIM. Most notably, in this model the training of the weights of feedforward and feedback connections can be performed simultaneously and independently, thus providing a biologically sound computational theory explaining how reciprocal connections are learnt in actual cortical areas \cite{callaway1998local,spratling2012unsupervised}.
+			Algorithms that work for one model can be adapted to work for the other one. In particular, PC/BC networks trained using the DIM algorithm are referred to as PC/BC--DIM. Most notably, in this model the training of the weights of feedforward and feedback connections can be performed simultaneously and independently, thus providing a biologically sound computational theory explaining how reciprocal connections are learnt in actual cortical areas \cite{callaway1998local,spratling2012unsupervised}.
 		
 		\section{The project}
 			The main focus of the project has been in improving the PC/BC--DIM algorithm with the ability to progressively grow a near-optimal network topology alongside the feedforward and feedback weights. In the process, I also implemented a constructive version of the basic DIM algorithm.
@@ -313,44 +314,37 @@
 			\subsection{Predictive coding}
 				\begin{figure}[h]
 					\centering
-					\includegraphics[scale=0.6]{prediction}
+					\includegraphics[scale=0.5]{prediction}
 					\caption{A graphical representation of a pair of adjacent populations in the PC model. \cite{spratling2014predictive}.}
 					\label{fig:predictive}
 				\end{figure}
 				
-				Predictive coding is commonly used to model information processing in cerebral cortex. It is typically implemented as hierarchical neural networks
-				with alternating populations of error-detecting and prediction neurons. Prediction neurons' activity produces a reconstruction of the inputs
-				via feedback connections to the preceding error-detecting neurons; error-detecting neurons calculate the residual error between
-				the reconstructed and actual inputs \cite{spratling2014predictive}.
+				Predictive coding is commonly used to model information processing in cerebral cortex. It is typically implemented as hierarchical neural networks with alternating populations of \emph{error-detecting} and \emph{prediction} neurons. Prediction neurons' activity produces a reconstruction of the inputs via feedback connections to the preceding error-detecting neurons; error-detecting neurons calculate the residual error between the reconstructed and the actual inputs \cite{spratling2014predictive}.
+				
+				Representing the weights with a matrix $W$, its rows, each of which corresponds to the weights targeting a single prediction neuron, represent the \emph{elementary components} from which the images can be reconstructed. The strength of activation of the prediction neuron thus encodes the \emph{degree of belief} that that pattern of inputs is present in the current image \cite{spratling2014predictive}.
+				
+				The matrix $W$ can thus be thought as a \emph{dictionary}, a model of the external world \cite{spratling2012unsupervised,spratling2014predictive}.
+
+				\begin{figure}[h]
+					\centering
+					\includegraphics[width=\textwidth]{pc}
+					\caption{Multi-stage, hierarchical predictive coding model. Open arrows signify excitatory connections, filled arrows inhibitory ones \cite{spratling2008reconciling}.}
+					\label{fig:pcbc}
+				\end{figure}
 
 			\subsection{Predictive coding as biased competition}
 				\begin{figure}[h]
 					\centering
-					\includegraphics[scale=0.4]{pcbc}
+					\includegraphics[width=\textwidth]{pcbc}
 					\caption{A graphical representation of the PC/BC model \cite{spratling2008predictive}.}
 					\label{fig:pcbc}
 				\end{figure}
 				
-				PC/BC is an alternative model that uses direct excitatory feedback from one population of prediction nodes to the preceding one \cite{spratling2008predictive}.
-				Activation rules for a PC/BC model as the one in figure~\ref{fig:pcbc} implemented as a hierarchical neural network are as follows:
+				\textcolor{red}{Expand.}
 				
-				$$e^{Si} = G(y^{Si-1}) \oslash [\epsilon_2 + (V^{Si})^T y^{Si}]$$
-				$$y^{Si} \leftarrow (\epsilon_1 + y^{Si}) \otimes W^{Si}e^{Si} \otimes [1 + \eta G((U^{Si+1}))^T y^{Si+1}]$$
+				PC/BC is an alternative model equivalent to PC but which uses direct excitatory feedback from one population of prediction nodes to the preceding one \cite{spratling2008predictive}.
 				
-				Where:
-				\begin{itemize}
-					\item $Si$ indicates the stage $i$ of the hierarchical network.
-					\item $e^{Si}$ is a $m \times 1$ vector of error-detecting neuron activations.
-					\item $y^{Si}$ is a $n \times 1$ vector of prediction neuron activations.
-					\item $W^{Si}$, $V^{Si}$, $U^{Si}$ are $n \times m$ matrces of synaptic weights.
-					\item $\epsilon_1$, $\epsilon_2$, $\eta$ are parameters.
-					\item $G$ is a function that clips values at 1. 
-				\end{itemize}
-				
-				In the first equation, the first term represent the actual input, while the second term represents the reconstructed input from the prediction neurons.
-				
-				In the second equation, the first term represents the previous value of $y^{Si}$, the second term is the feedforward input from error-detecting neurons to prediction ones, and
-				the third term represents the modulation coming from the top-down predicitions of the next stage, if any.
+				With some modifications, the rearranged model can be implemented by means of a negative feedback neural network as the ones analyzed previously \cite{spratling2008reconciling}.
 				
 		\section{Divisive Input Modulation}
 			\nomenclature{DIM}{Divisive Input Modulation.}
@@ -380,13 +374,34 @@
 			Divisive Input Modulation showed results superior to existing methods in learning image components, especially in the presence of occlusion and overlapping \cite{spratling2009unsupervised}.
 			
 			\subsection{PC/BC--DIM}
-			
+				\textcolor{red}{Expand.}
+				
+				Activation rules for a PC/BC model as the one in figure~\ref{fig:pcbc} implemented as a hierarchical neural network are as follows:
+				
+				$$e^{Si} = G(y^{Si-1}) \oslash [\epsilon_2 + (V^{Si})^T y^{Si}]$$
+				$$y^{Si} \leftarrow (\epsilon_1 + y^{Si}) \otimes W^{Si}e^{Si} \otimes [1 + \eta G((U^{Si+1}))^T y^{Si+1}]$$
+				
+				Where:
+				\begin{itemize}
+					\item $Si$ indicates the stage $i$ of the hierarchical network.
+					\item $e^{Si}$ is a $m \times 1$ vector of error-detecting neuron activations.
+					\item $y^{Si}$ is a $n \times 1$ vector of prediction neuron activations.
+					\item $W^{Si}$, $V^{Si}$, $U^{Si}$ are $n \times m$ matrces of synaptic weights.
+					\item $\epsilon_1$, $\epsilon_2$, $\eta$ are parameters.
+					\item $G$ is a function that clips values at 1. 
+				\end{itemize}
+				
+				In the first equation, the first term represent the actual input, while the second term represents the reconstructed input from the prediction neurons.
+				
+				In the second equation, the first term represents the previous value of $y^{Si}$, the second term is the feedforward input from error-detecting neurons to prediction ones, and the third term represents the modulation coming from the top-down predicitions of the next stage, if any.
+				
 		\section{Constructive Neural Networks}
 		\label{sec:constructive}
 
 	
 	\chapter{Main Result}
 		\section{Theoretical Development}
+			
 		\section{Analysis and Design}
 		\section{Implementation and Experimental Work}
 		\section{Results}

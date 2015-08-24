@@ -236,7 +236,7 @@
 				\begin{equation}
 					W \leftarrow W + \beta y e^T
 				\end{equation}
-				Where $y = [y_1, ..., y_n]^T$ represents the vector of the outputs,\\$x = [x_1, ..., x_m]^T$ the vector of inputs, $W = [w_1, ..., w_n]^T$ an $n$ by $m$ matrix of weights, with each row containing the weights received by a single nodes, and $e$ is the vector of inhibited inputs\footnote{As explained in the introduction (section~\ref{sec:background}), inhibited inputs can be equivalently interpreted as representing the \emph{reconstruction error} of the network, without any changes to the mathematical model \cite{spratling2009unsupervised}.}.
+				Where $y = [y_1, ..., y_n]^T$ represents the vector of the outputs,\\$x = [x_1, ..., x_m]^T$ the vector of inputs, $W = [w_1, ..., w_n]^T$ an $n$ by $m$ matrix of weights, with each row containing the weights received by a single node, and $e$ is the vector of inhibited inputs\footnote{As explained in the introduction (section~\ref{sec:background}), inhibited inputs can be equivalently interpreted as representing the \emph{reconstruction error} of the network, without any changes to the mathematical model \cite{spratling2009unsupervised}.}.
 			
 				The third equation describes the training rule, where $\beta$ is a parameter known as \emph{learning rate}. As it can be seen from all the equations, the inhibited inputs only influence the learning phase and not the output of the network directly, so this model does not fully implement competition which, in the application we are concerned of, results in the inability of the network to correctly represent the input, even when the weights have been correctly learned.
 				
@@ -321,7 +321,7 @@
 				
 				Predictive coding is commonly used to model information processing in cerebral cortex. It is typically implemented as hierarchical neural networks with alternating populations of \emph{error-detecting} and \emph{prediction} neurons. Prediction neurons' activity produces a reconstruction of the inputs via feedback connections to the preceding error-detecting neurons; error-detecting neurons calculate the residual error between the reconstructed and the actual inputs \cite{spratling2014predictive}.
 				
-				Representing the weights with a matrix $W$, its rows, each of which corresponds to the weights targeting a single prediction neuron, represent the \emph{elementary components} from which the images can be reconstructed. The strength of activation of the prediction neuron thus encodes the \emph{degree of belief} that that pattern of inputs is present in the current image \cite{spratling2014predictive}.
+				By having the weights in a matrix $W$, its rows, each of which corresponds to the weights targeting a single prediction neuron, represent the \emph{elementary components} from which the images can be reconstructed. The strength of activation of the prediction neuron thus encodes the \emph{degree of belief} that that pattern of inputs is present in the current image \cite{spratling2014predictive}.
 				
 				The matrix $W$ can thus be thought as a \emph{dictionary}, a model of the external world \cite{spratling2012unsupervised,spratling2014predictive}.
 
@@ -347,6 +347,7 @@
 				With some modifications, the rearranged model can be implemented by means of a negative feedback neural network as the ones analyzed previously \cite{spratling2008reconciling}.
 				
 		\section{Divisive Input Modulation}
+			\label{sec:dim}
 			\nomenclature{DIM}{Divisive Input Modulation.}
 			Notwithstanding the improvements of the sequential NMF algorithm compared to Fyfe and Harpur's networks, the former still suffers from a weakness that makes it poor at learning image components when overlapping between components is present in the training images \cite{spratling2009unsupervised}.
 			
@@ -400,10 +401,40 @@
 
 	
 	\chapter{Main Result}
-		\section{Theoretical Development}
-			
 		\section{Analysis and Design}
+			\subsection{Motivation}
+				There are various advantages in developing a constructive neural network algorithm over a standard one; some of them are obvious while some of them are more subtle.
+				
+				First of all, as stated in the introductory section, differences in architecture and size can be all the difference needed in making a network useful for the problem. In this field, choices are often the result of trial and error and, as such, often result in designs which are larger than what would be actually needed \cite{?}. This has two main repercussions on the performance of the network.
+				
+				On one hand, training a bigger network is computationally more expensive. On the other hand, models with too many degrees of freedom, while they can perform more complicated mappings, tend to overfit the training data and are not able to perform well over unseen instances. This ability, called \emph{generalization}, implies lower order mappings \cite{alpaydin1994gal}.
+				
+				An analogy with the problem of curve fitting using polynomials serves to illustrate the point: a polynomial with too few coefficients will be unable to capture the underlying function, while a polynomial with too many coefficients will fit the noise in the data and also result in a poor representation of the function. On the contrary, the optimal number of coefficients will result in the best representation of the function and also the best predictions for new data \cite{kwok1997objective}. Constructive algorithms solve this problem by incorporating the evolution of the network structure into the learning algorithm.
+				
+				Less obviously, but importantly, algorithms that prefer small solutions have the possibility to discover a minimal (or near-minimal) network which potentially suits the intrinsic complexity of the learning task \cite{parekh2000constructive}.
+
+			\subsection{Analysis of the current algorithm}
+				The details of the Divisive Input Modulation algorithm and the theory on which is based have already been discussed in section~\ref{sec:dim}; in this subsection we are only interested in focusing on the aspects that are most relevant in the design of its constructive version.
+
+				\begin{figure}[h]
+					\centering
+					\includegraphics[width=0.3\textwidth]{basictopology}
+					\caption{Basic structure of the neural network used by DIM \cite{spratling2009unsupervised}.}
+					\label{fig:dim}
+				\end{figure}
+
+				Specifically, we should analyse the parameters involved to discover which ones makes sense to modify at runtime. The $m$ pixels in the images, indicated by $x_1, ..., x_m$, which are mapped one-to-one to the \emph{error-detecting} neurons ($e_1, ..., e_m$) are fixed parameters depending on the training set. The part of the network that can be grown or shrunk in size is the output or \emph{predictive} layer ($y_1, ..., y_n$) and, consequently, the number of rows in the matrix of weights $W$; in short, the parameter $n$.
+				
+				A question which is important to answer is: what does tuning this parameter means in terms of image decomposition? As it is known from the literature \cite{spratling2014predictive}, the weights received by a single output neuron are contained in the respective row 
+				
+			\subsection{Classes of constructive algorithms}
+				Cascade vs DNC.
+			\subsection{Criteria for adding neurons}
+			\subsection{Division in epochs}
+			\subsection{Weight training}
+			
 		\section{Implementation and Experimental Work}
+			
 		\section{Results}
 		\section{Discussion}
 		

@@ -427,7 +427,7 @@
 				
 				A question which is important to answer is: what does tuning this parameter means in terms of image decomposition? As it is known from the literature \cite{spratling2014predictive}, the weights received by a single output neuron are contained in the respective row in the matrix $W$; each row corresponds to an elementary component discovered in the image. So tuning the parameter $n$ equals to identify the exact number of components needed to describe the images in the training set.
 				
-				Another important point is: what factor should drive the decision of adding neurons to the network? The way the model is engineered, the values of the error-detecting neurons 
+				Another important point is: what factor should drive the decision of adding neurons to the network? The way the algorithm is engineered, the values of the error-detecting neurons provide an estimation of how accurately the generative model is reconstructing the original input, and thus explaining its composition. Specifically, when a value within $e$ is greater than 1, the corresponding element in the input is under-represented in the reconstruction, whereas if that value is less than 1, the opposite true. The interpretation of the image is perfect if $e$ is equal to 1. So it makes perfect sense to somehow consider by how far the values of $e$ are from the unity in order to approximate the accuracy the network has reached.
 				
 			\subsection{Classes of constructive algorithms}
 				\nomenclature{CC}{Cascade Correlation.}
@@ -439,18 +439,19 @@
 				
 				For this reason, the class of algorithms known as DNC was considerate more appropriate for the task. The original model proposed by Ash \cite{ash1989dynamic} is quite simple: the algorithm adds neurons to the designated layer until the precision of the output reaches the desired level. The entire neural network is retrained every time a neuron is added.
 				
-				Even though these algorithm were conceived for simple feed forward neural networks, they have been proven successful even when applied to recurrent neural networks \cite{ash1989dynamic}.
+				Even though these algorithm were conceived for simple feed forward neural networks, they have been proven successful even when applied to recurrent networks \cite{ash1989dynamic}.
 				
 			\subsection{Criteria for adding neurons}
-				One of the main decisions to be made when designing a constructive algorithm is under what conditions should new neurons be added to the network. To better understand 
+				One of the main decisions to be made when designing a constructive algorithm is under what conditions should new neurons be added to the network. An analysis of the shape of a typical curve describing the overall error in the network over time will help understand the issue.
+				
+				At first, I experimented with a very simple criterion: simply add a neuron if the overall average error, measured among all the elements of $e$ and for one epoch, is higher than a certain threshold. Results were not great and the network tended to grow bigger 
 				
 				\begin{figure}[h]
 					\centering
-					\includegraphics[width=0.8\textwidth]{error}
+					\includegraphics[width=0.9\textwidth]{error}
 					\caption{Graphic of the overall error as a function of training time \cite{ash1989dynamic}.}
 					\label{fig:error}
 				\end{figure}
-				
 				
 				
 			\subsection{Division in epochs}

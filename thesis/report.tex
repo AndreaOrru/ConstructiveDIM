@@ -29,8 +29,8 @@
 	\end{abstract}
 	
 	
-	\chapter*{Acknowledgements}
-	\addcontentsline{toc}{chapter}{Acknowledgements}
+	\chapter*{Acknowledgments}
+	\addcontentsline{toc}{chapter}{Acknowledgments}
 	I would like to express my appreciation to professor \textbf{Spratling}, my supervisor, for his never-ending patience and availability when guiding me towards the completion of this project.
 	
 	I will never be able to thank my best friend \textbf{Claudio} enough, as I would have never got this far without him. But I want to try anyway: thank you for all the chatting, the laughs, the \emph{pasta parties}, and the advices, the insights, the constant inspiration. Most of all, thank you for being there all the time, making the good moments memorable and the terrible ones bearable. You never failed me: your loyalty redefined my whole concept of friendship. I owe you a life debt.
@@ -442,9 +442,30 @@
 				Even though these algorithm were conceived for simple feed forward neural networks, they have been proven successful even when applied to recurrent networks \cite{ash1989dynamic}.
 				
 			\subsection{Criteria for adding neurons}
-				One of the main decisions to be made when designing a constructive algorithm is under what conditions should new neurons be added to the network. An analysis of the shape of a typical curve describing the overall error in the network over time will help understand the issue.
+				One of the main decisions to be made when designing a constructive algorithm is under what conditions should new neurons be added to the network.
 				
-				At first, I experimented with a very simple criterion: simply add a neuron if the overall average error, measured among all the elements of $e$ and for one epoch, is higher than a certain threshold. Results were not great and the network tended to grow bigger 
+				At first, I experimented with a very simple criterion: simply add a neuron if the overall average error, measured as the absolute distance from 1 among all the elements of $e$ and for one epoch, is higher than a certain threshold. Results were not very good and the network tended to grow bigger and bigger, which initially led me to introduce a pruning phase to overcome the problem. As stated in section \textcolor{red}{section}, pruning is an inherently inferior solution compared to constructive, so I moved forward to explore different approaches.
+				
+				An analysis of the shape of a typical curve describing the overall squared error in the network over time will help in deriving a better criterion. First of all, note that the error monotonically decreases over time. However, at some point the learning tends to reach a plateau and any further improvement will follow the rule of diminishing returns \cite{ash1989dynamic}. Just before that happens is the right moment when to change the topology of the network (i.e. adding a neuron) to prevent the plateau to occur.
+				
+				Mathematically, if:
+				\begin{itemize}
+					\item $a_t$ is the average squared error at time \emph{t} across all the network,
+					\item $t_0$ is the time when the last node was added,
+					\item $t$ is the current time,
+					\item $w$ is the size of the time window over which the slope is evaluated,
+					\item $\Delta_T$ is the \emph{trigger slope}, namely the value of the slope under which a neuron is added,
+				\end{itemize}
+				then a neuron is added to the network if the following conditions are met:
+				\begin{equation}
+					\label{eq:slope}
+					\frac{\left| a_t - a_{t-w} \right|}{a_{t_0}} < \Delta_T
+				\end{equation}
+				\begin{equation}
+					\label{eq:topology}
+					t - w \geq t_0
+				\end{equation}
+				Equation~\ref{eq:slope} detects when the error curve gets into a plateau, according to the user-set parameter $\Delta_T$, while equation~\ref{eq:topology} ensures that the first one always deals with the same topology.
 				
 				\begin{figure}[h]
 					\centering
@@ -453,8 +474,19 @@
 					\label{fig:error}
 				\end{figure}
 				
+				This proved to be a much better measure than the original one, however the network would still keep growing indefinitely, trying to get a lower error even when the mapping is learned. Clearly, criteria for when to stop adding neurons to the network are needed. So, the algorithm will not add any nodes no matter what once the average error goes under a certain specified threshold:
+				
+				\begin{equation}
+					a_t \leq C
+				\end{equation}
+				
+				where $C$ is the over-mentioned, user-defined threshold.
+				
+				With the last modification, the algorithm performed fairly well, however there was still room for improvement. Specifically 
 				
 			\subsection{Division in epochs}
+				
+			
 			\subsection{Weight training}
 			
 		\section{Implementation and Experimental Work}

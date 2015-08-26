@@ -482,14 +482,20 @@
 				
 				where $C$ is the over-mentioned, user-defined threshold.
 				
-				With the last modification, the algorithm performed fairly well, however there was still room for improvement. Specifically 
+				With the last modification, the algorithm performed fairly well, however there was still room for improvement. Specifically, as it is not possible to know \emph{a priori} how big the network is going to be, the algorithm has to start with the smallest possible network, which is the one with a single predictive neuron. However, it can take various iterations to bring the network to an adequate size, especially if the number of components which make up the images is high.
+				
+				Intuition suggests, and experiments have confirmed, that when the number of neurons in the network is largely inadequate to describe the images, then error-detecting neurons are going to yield values whose distance from the unity (and thus from correct representation) is very high. In this case, and thus if the error is over a certain threshold, the algorithm increases the number of neurons exponentially until it goes under that threshold. It then starts behaving as described early, i.e. by adding neurons one at a time. This procedure is inspired by the TCP congestion control algorithm \cite{allman2009tcp}, in particular by its \emph{{exponential growth}} phase.
 				
 			\subsection{Division in epochs}
-				
+				To efficiently implement the concept of the \emph{window}, explained in the previous section, I decided to modify the original algorithm, by dividing the training procedure in \emph{epochs}. Throughout an epoch, each of which is constituted by a tunable number of cycles, the average of the error across the training set is kept updated. At the end of an epoch, and before starting the next one, the previously mentioned criteria are checked and the topology of the network modified accordingly, if necessary.
 			
 			\subsection{Weight training}
+				Another outstanding question is how should weight training occur when the network grows in size? From the point of view of computational efficiency, and assuming that the units already present in the network are useful in part of the reconstruction \cite{kwok1997objective}, it would make sense to implement \emph{weight freezing}, that is, keeping the weights targeting the already existing neurons fixed, and allowing the new ones to vary.
+				
+				However, a case is made by Ash \cite{ash1989dynamic} that holding the existing network values constant only allows finding a solution in an affine subset of the weight space. The experiments I performed confirmed this thesis and the final version of my algorithm thus retrains whole the weights after each topology update.
 			
-		\section{Implementation and Experimental Work}
+		\section{Implementation}
+			
 			
 		\section{Results}
 		\section{Discussion}

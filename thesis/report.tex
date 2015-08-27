@@ -441,7 +441,7 @@
 			\subsection{Motivation}
 				There are various advantages in developing a constructive neural network algorithm over a standard one; some of them are obvious while some of them are more subtle.
 				
-				First of all, as stated in the introductory section, differences in architecture and size can be all the difference needed in making a network useful for the problem. In this field, choices are often the result of trial and error and, as such, often result in designs which are larger than what would be actually needed \cite{?}. This has two main repercussions on the performance of the network.
+				First of all, as stated in the introductory section, differences in architecture and size can be all the difference needed in making a network useful for the problem. In this field, choices are often the result of trial and error and, as such, often result in designs which are larger than what would be actually needed. This has two main repercussions on the performance of the network.
 				
 				On one hand, training a bigger network is computationally more expensive. On the other hand, models with too many degrees of freedom, while they can perform more complicated mappings, tend to overfit the training data and are not able to perform well over unseen instances. This ability, called \emph{generalization}, implies lower order mappings \cite{alpaydin1994gal}.
 				
@@ -465,13 +465,14 @@
 				
 				Another important point is: what factor should drive the decision of adding neurons to the network? The way the algorithm is engineered, the values of the error-detecting neurons provide an estimation of how accurately the generative model is reconstructing the original input, and thus explaining its composition. Specifically, when a value within $e$ is greater than 1, the corresponding element in the input is under-represented in the reconstruction, whereas if that value is less than 1, the opposite true. The interpretation of the image is perfect if $e$ is equal to 1. So it makes perfect sense to somehow consider by how far the values of $e$ are from the unity in order to approximate the accuracy the network has reached.
 			
-				\textcolor{red}{Talk about the fact that the network is fully connected.}
+				In general another outstanding problem would be how the new neuron has to be connected to the network; however, in a fully connected network like the one we are dealing with, the solution is simple: it has to be connected to all the error-detecting nodes.
 				
 			\subsection{Classes of constructive algorithms}
+				\label{sec:classes}
 				\nomenclature{CC}{Cascade Correlation.}
 				\nomenclature{DNC}{Dynamic Node Creation.}
 				
-				\textcolor{red}{Pruning and why purely constructive is better.}
+				There are two angles from which tackling the problem of learning a network topology. One involves using a larger than needed network and training it until a solution is found; then, units are removed if they are not actively used. This is called \emph{pruning}. The other, the regular \emph{constructive} approach, starts with a small network and then grows additional units. The constructive approach has various advantages over pruning: first of all, it is really easy to specify an initial network, whereas for pruning algorithms is not obvious how big the initial network has to be; secondly, constructive algorithm search for small solutions first, so they are more computationally efficient \cite{kwok1997objective}. For these reasons and because of the results in the initial experiments I performed, the constructive process was picked over pruning.
 				
 				According to \cite{fernandes2014constructive}, two main approaches can be identified in the development of constructive neural network algorithms: they are \emph{Cascade Correlation} (CC) and \emph{Dynamic Node Creation} (DNC). Cascade Correlation and its derived algorithms are not suited for the problem at hand, as they create neural networks with multiple hidden layers, whereas DIM expects a single constructive layer to grow in the number of neurons.
 				
@@ -482,7 +483,7 @@
 			\subsection{Criteria for adding neurons}
 				One of the main decisions to be made when designing a constructive algorithm is under what conditions should new neurons be added to the network.
 				
-				At first, I experimented with a very simple criterion: simply add a neuron if the overall average error, measured as the absolute distance from 1 among all the elements of $e$ and for one epoch, is higher than a certain threshold. Results were not very good and the network tended to grow bigger and bigger, which initially led me to introduce a pruning phase to overcome the problem. As stated in section \textcolor{red}{section}, pruning is an inherently inferior solution compared to constructive, so I moved forward to explore different approaches.
+				At first, I experimented with a very simple criterion: simply add a neuron if the overall average error, measured as the absolute distance from 1 among all the elements of $e$ and for one epoch, is higher than a certain threshold. Results were not very good and the network tended to grow bigger and bigger, which initially led me to introduce a pruning phase to overcome the problem. As stated in section~\ref{sec:classes}, pruning is an inherently inferior solution compared to constructive, so I moved forward to explore different approaches.
 				
 				An analysis of the shape of a typical curve describing the overall squared error in the network over time will help in deriving a better criterion. First of all, note that the error monotonically decreases over time. However, at some point the learning tends to reach a plateau and any further improvement will follow the rule of diminishing returns \cite{ash1989dynamic}. Just before that happens is the right moment when to change the topology of the network (i.e. adding a neuron) to prevent the plateau to occur.
 				
@@ -522,7 +523,7 @@
 				
 				With the last modification, the algorithm performed fairly well, however there was still room for improvement. Specifically, as it is not possible to know \emph{a priori} how big the network is going to be, the algorithm has to start with the smallest possible network, which is the one with a single predictive neuron. However, it can take various iterations to bring the network to an adequate size, especially if the number of components which make up the images is high.
 				
-				Intuition suggests, and experiments have confirmed, that when the number of neurons in the network is largely inadequate to describe the images, then error-detecting neurons are going to yield values whose distance from the unity (and thus from correct representation) is very high. In this case, and thus if the error is over a certain threshold, the algorithm increases the number of neurons by a multiplicative factor until it goes under that threshold. It then starts behaving as described early, i.e. by adding neurons one at a time. This procedure is inspired by the TCP congestion control algorithm \cite{allman2009tcp}, in particular by its \emph{{exponential growth}} phase.
+				Intuition suggests, and experiments have confirmed, that when the number of neurons in the network is largely inadequate to describe the images, then error-detecting neurons are going to yield values whose distance from the unity (and thus from correct representation) is very high. In this case, and thus if the error is over a certain threshold, the algorithm increases the number of neurons by a multiplicative factor until it goes under that threshold. It then starts behaving as described early, i.e. by adding neurons one at a time. This procedure is inspired by the (otherwise unrelated) TCP congestion control algorithm \cite{allman2009tcp}, in particular by its \emph{{exponential growth}} phase.
 				
 			\subsection{Division in epochs}
 				To efficiently implement the concept of the \emph{window}, explained in the previous section, I decided to modify the original algorithm, by dividing the training procedure in \emph{epochs}. Throughout an epoch, each of which is constituted by a tunable number of cycles, the average of the error across the training set is kept updated. At the end of an epoch, and before starting the next one, the previously mentioned criteria are checked and the topology of the network modified accordingly, if necessary.
@@ -530,7 +531,7 @@
 			\subsection{Weight training}
 				Another outstanding question is how should weight training occur when the network grows in size? From the point of view of computational efficiency, and assuming that the units already present in the network are useful in part of the reconstruction \cite{kwok1997objective}, it would make sense to implement \emph{weight freezing}, that is, keeping the weights targeting the already existing neurons fixed, and allowing the new ones to vary.
 				
-				However, a case is made by Ash \cite{ash1989dynamic} that holding the existing network values constant only allows finding a solution in an affine subset of the weight space. The experiments I performed confirmed this thesis and the final version of my algorithm thus retrains whole the weights after each topology update.
+				However, a case is made by Ash \cite{ash1989dynamic} that holding the existing network values constant only allows finding a solution in an affine subset of the weight space. The experiments I performed confirmed this thesis and the final version of my algorithm thus retrains whole the weights after each topology update. Note, however, that the values of the weights are conserved across the epochs.
 			
 		\section{Implementation}
 			

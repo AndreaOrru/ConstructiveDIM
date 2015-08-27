@@ -12,7 +12,7 @@ p=6;                     %length of one side of input image
 s=3;                     %size of square image components
 n=4;                     %number of nodes
 m=p*p;                   %number of inputs
-epochs=25;               %number of training epochs
+epochs=50;               %number of training epochs
 cycs=1000;               %number of training cycles per epoch
 patterns=1000;           %number of training patterns in training set
 numsquares=(p-s+1).^2;
@@ -26,8 +26,9 @@ t0 = 1;                      %time of last added neuron
 window = 1;                  %window for slope calculation
 tslope = 0.05;               %trigger slope
 esptsh = 0.35;               %average error until exponential growth
-cutavg = 0.20;               %average error to cut growing
-stop   = 0;                  %boolean value to stop growing
+cutavg = 0.21;               %average error to cut growing
+stpavg = 0.20;               %average error to stop
+grow   = 1;                  %boolean value to control growing
 eavgs  = zeros(1, epochs);   %average errors per epochs
 
 %generate a fixed pattern set
@@ -75,12 +76,17 @@ for t=1:epochs
   recognized = squares_plot(s,W);
   
   %check stop condition
+  if eavgs(t) <= stpavg,
+      break;
+  end;
+  
+  %check stop growing condition
   if eavgs(t) <= cutavg,
-      stop = 1;
+      grow = 0;
   end;
   
   %check growing condition
-  if ~stop,
+  if grow,
     %esponential growth
     if eavg >= esptsh,
       t0 = t;

@@ -1,5 +1,7 @@
 function dim_squares()
 
+tic
+
 %set network parameters
 beta=0.05;                %learning rate
 iterations=50;            %number of iterations to calculate y (for each input)
@@ -10,7 +12,7 @@ p=6;                     %length of one side of input image
 s=3;                     %size of square image components
 n=4;                     %number of nodes
 m=p*p;                   %number of inputs
-epochs=25;               %number of training epochs
+epochs=20;               %number of training epochs
 cycs=1000;               %number of training cycles per epoch
 patterns=1000;           %number of training patterns in training set
 numsquares=(p-s+1).^2;
@@ -101,6 +103,7 @@ end
 s=sum(W'), disp(num2str([max(s),min(s),max(max(W)),min(min(W))]))
 disp('');  
 
+toc
 
 
 function [x,patterns,input_set_components]=squares_pattern_randprob(m,s,prob,mincontrast)

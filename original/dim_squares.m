@@ -1,5 +1,7 @@
 function dim_squares()
 
+tic
+
 %set network parameters
 beta=0.05;                %learning rate
 iterations=50;            %number of iterations to calculate y (for each input)
@@ -57,7 +59,9 @@ for k=1:cycs
 end
 
 s=sum(W'), disp(num2str([max(s),min(s),max(max(W)),min(min(W))]))
-disp('');  
+disp('');
+
+toc
 
 
 

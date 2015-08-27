@@ -25,7 +25,7 @@
 	
 	
 	\begin{abstract}
-		This paper presents a constructive version of the state-of-the-art Divisive Input Modulation algorithm for the unsupervised learning of image components. Nodes are added to the predictive layer dynamically and throughout the learning process on the basis of the reconstruction error calculated by the network. The proposed solution adapts methods from existing constructive algorithms to the negative feedback network architecture employed by the original DIM implementation. The algorithm that has been developed results in similar levels of accuracy, while at the same time it consistently builds smaller networks. The conducted work thus represents a significant improvement over the original model in regards to training times and size of the neural network.
+		This paper presents a constructive version of the state-of-the-art Divisive Input Modulation algorithm for the unsupervised learning of image components. Nodes are added to the predictive layer dynamically and throughout the learning process on the basis of the reconstruction error calculated by the network. The proposed solution adapts methods from existing constructive algorithms to the negative feedback network architecture employed by the original DIM implementation. The algorithm that has been developed results in similar levels of accuracy, while at the same striving to build the smallest possible network. The conducted work thus represents a significant improvement over the original model in regards to training times and complexity of the neural network.
 	\end{abstract}
 	
 	
@@ -399,6 +399,23 @@
 				
 		\section{Constructive Neural Networks}
 		\label{sec:constructive}
+			\emph{Constructive algorithms} are used to adjust the structure of a neural network during the learning phase. Different approaches are possible: a purely constructive one adds layers, neurons and connections starting from a minimal architecture, whereas \emph{pruning} starts from a complex structure and removes redundant parts; the two approaches can also be combined \cite{parekh2000constructive}.
+					
+			The advantages of using a constructive algorithm are, among the others:
+			\begin{itemize}
+				\item It is flexible: the whole space of possible neural network configurations can be explored.
+				\item The initial configuration of the model is minimal and straightforward.
+				\item Final configurations can be thought as estimating the real complexity of the learned problem.
+			\end{itemize}
+					
+			The two main branches of constructive algorithms are Cascade Correlation (CC) and Dynamic Node Creation (DNC):
+			
+			The CC algorithm produces neural networks with multiple hidden layers, with one neuron each that is connected to all other neurons previously added \cite{sharma2010constructive}.
+					
+			DNC add neurons in a hidden layer until the network achieves an approximation of the desired performances.
+			Every time a neuron is added, all the weights are retrained. This is effective but at the expense of computational cost. \cite{sharma2010constructive}
+					
+			OHL-FNN is an extension of DNC that freezes the neural network weights that have been previously trained, and that retrains only the weights affected by the insertion \cite{kwok1997objective}.
 
 	
 	\chapter{Main Result}
@@ -487,7 +504,7 @@
 				
 				With the last modification, the algorithm performed fairly well, however there was still room for improvement. Specifically, as it is not possible to know \emph{a priori} how big the network is going to be, the algorithm has to start with the smallest possible network, which is the one with a single predictive neuron. However, it can take various iterations to bring the network to an adequate size, especially if the number of components which make up the images is high.
 				
-				Intuition suggests, and experiments have confirmed, that when the number of neurons in the network is largely inadequate to describe the images, then error-detecting neurons are going to yield values whose distance from the unity (and thus from correct representation) is very high. In this case, and thus if the error is over a certain threshold, the algorithm increases the number of neurons exponentially until it goes under that threshold. It then starts behaving as described early, i.e. by adding neurons one at a time. This procedure is inspired by the TCP congestion control algorithm \cite{allman2009tcp}, in particular by its \emph{{exponential growth}} phase.
+				Intuition suggests, and experiments have confirmed, that when the number of neurons in the network is largely inadequate to describe the images, then error-detecting neurons are going to yield values whose distance from the unity (and thus from correct representation) is very high. In this case, and thus if the error is over a certain threshold, the algorithm increases the number of neurons by a multiplicative factor until it goes under that threshold. It then starts behaving as described early, i.e. by adding neurons one at a time. This procedure is inspired by the TCP congestion control algorithm \cite{allman2009tcp}, in particular by its \emph{{exponential growth}} phase.
 				
 			\subsection{Division in epochs}
 				To efficiently implement the concept of the \emph{window}, explained in the previous section, I decided to modify the original algorithm, by dividing the training procedure in \emph{epochs}. Throughout an epoch, each of which is constituted by a tunable number of cycles, the average of the error across the training set is kept updated. At the end of an epoch, and before starting the next one, the previously mentioned criteria are checked and the topology of the network modified accordingly, if necessary.
@@ -504,7 +521,7 @@
 			
 			Both problems test the ability of the algorithm to learn the component parts from which a set of artificial training images are composed \cite{spratling2009unsupervised,spratling2012unsupervised}. The tests focus on three aspects: accuracy of the recognition, size of the network and training time.
 			
-			\subsection{DIM}
+			\subsection{Divisive Input Modulation}
 				\subsubsection{Squares problem}
 				\begin{figure}[h]
 					\centering
@@ -522,12 +539,16 @@
 					\begin{tabular}{l*{4}{c}}
 						Algorithm         & Accuracy & Cycles & Training time & Neurons \\
 						\hline
-						DIM               & 100\%    & 20000  & 42s           & 48      \\
+						DIM               & 100\%    & 20000  & 18.9770s      & 48      \\
 						Constructive DIM  & 100\%    & 20000  & 42s           & 48      \\
 					\end{tabular}
 					\caption{Performances as measured in a dataset of 6-by-6 pixel images with 3-by-3 pixel components.}
 					\label{tab:performance}
 				\end{table}
+				
+			\subsection{PC/BC--DIM}
+				\subsubsection{Bars problem}
+				\subsubsection{Results}
 		
 		\section{Discussion}
 		

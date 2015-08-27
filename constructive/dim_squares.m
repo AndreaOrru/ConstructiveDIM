@@ -1,4 +1,4 @@
-function dim_squares()
+function recognized = dim_squares()
 
 tic
 
@@ -12,7 +12,7 @@ p=6;                     %length of one side of input image
 s=3;                     %size of square image components
 n=4;                     %number of nodes
 m=p*p;                   %number of inputs
-epochs=20;               %number of training epochs
+epochs=25;               %number of training epochs
 cycs=1000;               %number of training cycles per epoch
 patterns=1000;           %number of training patterns in training set
 numsquares=(p-s+1).^2;
@@ -25,8 +25,8 @@ mincontrast=1;
 t0 = 1;                      %time of last added neuron
 window = 1;                  %window for slope calculation
 tslope = 0.05;               %trigger slope
-esptsh = 0.45;               %average error until exponential growth
-cutavg = 0.25;               %average error to cut growing
+esptsh = 0.35;               %average error until exponential growth
+cutavg = 0.20;               %average error to cut growing
 stop   = 0;                  %boolean value to stop growing
 eavgs  = zeros(1, epochs);   %average errors per epochs
 
@@ -72,7 +72,7 @@ for t=1:epochs
   %show weights
   fprintf(1,'nodes: %i, error: %f, ',n,eavg);
   eavgs(t) = eavg;
-  squares_plot(s,W);
+  recognized = squares_plot(s,W);
   
   %check stop condition
   if eavgs(t) <= cutavg,
@@ -84,7 +84,7 @@ for t=1:epochs
     %esponential growth
     if eavg >= esptsh,
       t0 = t;
-      n = n * 2;
+      n = round(n * 1.5);
       W=(1/16)+(1/64).*randn(n,m);			   
       W(W<0)=0;	
     
@@ -93,7 +93,7 @@ for t=1:epochs
       if (abs(eavgs(t) - eavgs(t - window)) / eavgs(t0)) < tslope,
         t0 = t;
         n = n + 1;
-        W=(1/16)+(1/64).*randn(n,m);			   
+        W=[W; (1/16)+(1/64).*randn(1,m)];
         W(W<0) = 0;
       end;
     end;

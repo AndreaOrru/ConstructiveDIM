@@ -1,4 +1,4 @@
-function dim_squares()
+function recognized = dim_squares()
 
 tic
 
@@ -54,7 +54,7 @@ for k=1:cycs
 
   if rem(k,show)==0,
 	%show weights
-	squares_plot(s,W);
+	recognized = squares_plot(s,W);
   end
 end
 

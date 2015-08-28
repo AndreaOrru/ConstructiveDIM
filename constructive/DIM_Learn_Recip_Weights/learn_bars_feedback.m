@@ -1,4 +1,4 @@
-function [X,W,V,U]=learn_bars_feedback(gen,W,V,U)
+function [X,W,V,U,n,recognized,cycles]=learn_bars_feedback(gen,W,V,U)
 %DEFINE NETWORK PARAMETERS
 beta=0.005;              %learning rate
 iterations=200;          %number of iterations to calculate y (for each input)
@@ -21,10 +21,11 @@ figoffset=0;
 t0 = 1;                      %time of last added neuron
 window = 1;                  %window for slope calculation
 tslope = 0.05;               %trigger slope
-exptsh = 1.00;               %average error until exponential growth
-cutavg = 0.60;               %average error to cut growing
-stpavg = 0.55;               %average error to stop
+exptsh = 1.20;               %average error until exponential growth
+cutavg = 0.50;               %average error to cut growing
+stpavg = 0.0;                %average error to stop
 mult   = 1.5;                %multiplicative factor for growing
+
 grow   = 1;                  %boolean value to control growing
 eavgs  = zeros(1, epochs);   %average errors per epoch
 
@@ -96,9 +97,10 @@ for t=1:epochs
   
   %show results
   if dispresults
-    set(0,'CurrentFigure',1+figoffset); plot_bars(gen,W);
-    set(0,'CurrentFigure',2+figoffset); plot_bars(gen,V);
-    set(0,'CurrentFigure',3+figoffset); plot_bars(gen,U);
+    recognized = 0;
+    set(0,'CurrentFigure',1+figoffset); recognized = recognized + plot_bars(gen,W);
+    set(0,'CurrentFigure',2+figoffset); recognized = recognized + plot_bars(gen,V);
+    set(0,'CurrentFigure',3+figoffset); recognized = recognized + plot_bars(gen,U);
     disp([' ymax=',num2str(ymax),' wSum=',num2str(max(sum(W'))),' vSum=',...
         num2str(max(sum(V'))),' uSum=',num2str(max(sum(U')))]);
     ymax=0;
@@ -128,7 +130,9 @@ for t=1:epochs
       if (abs(eavgs(t) - eavgs(t - window)) / eavgs(t0)) < tslope,
         t0 = t;
         n = n + 1;
-        [W,V,U]=weight_initialisation_random(n,m);
+        W=[W; weight_initialisation_random(1,m)];
+        V=[V; weight_initialisation_random(1,m)];
+        U=[U; weight_initialisation_random(1,m)];
         y = [];
       end;
     end;
@@ -142,4 +146,4 @@ if dispresults
   disp('');  
 end
 
-
+cycles = t*cycs;

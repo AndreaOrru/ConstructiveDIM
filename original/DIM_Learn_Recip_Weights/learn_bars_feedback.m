@@ -1,4 +1,4 @@
-function [X,W,V,U]=learn_bars_feedback(gen,W,V,U)
+function [X,W,V,U,recognized]=learn_bars_feedback(gen,W,V,U)
 %DEFINE NETWORK PARAMETERS
 beta=0.005;              %learning rate
 iterations=200;          %number of iterations to calculate y (for each input)
@@ -7,14 +7,14 @@ if nargin<1
 end
 p=5;                     %length of one side of input image/number of bars at
                          %each orientation
-n=24;                    %number of nodes
+n=10;                    %number of nodes
 m=p*p;                   %number of inputs
 cycs=20000;              %number of training cycles 
 patterns=400;            %number of training patterns in training set
 show=1000;               %how often to plot receptive field data
 noise=0.1;                 %amount of noise to add to each training pattern
 continuousLearning=0;    %learn at every iteration, or using steady-state responses
-dispresults=0;
+dispresults=1;
 figoffset=0;
 
 %GENERATE TRAINING DATA
@@ -72,9 +72,10 @@ for k=1:cycs
   ymax=max([ymax,max(y)]);  
   %show results
   if rem(k,show)==0 & dispresults
-	set(0,'CurrentFigure',1+figoffset); plot_bars(gen,W);
-	set(0,'CurrentFigure',2+figoffset); plot_bars(gen,V);
-	set(0,'CurrentFigure',3+figoffset); plot_bars(gen,U);
+    recognized = 0;
+	set(0,'CurrentFigure',1+figoffset); recognized = recognized + plot_bars(gen,W);
+	set(0,'CurrentFigure',2+figoffset); recognized = recognized + plot_bars(gen,V);
+	set(0,'CurrentFigure',3+figoffset); recognized = recognized + plot_bars(gen,U);
 	disp([' ymax=',num2str(ymax),' wSum=',num2str(max(sum(W'))),' vSum=',...
 		  num2str(max(sum(V'))),' uSum=',num2str(max(sum(U')))]);
 	ymax=0;

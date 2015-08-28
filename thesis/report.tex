@@ -772,10 +772,10 @@ end;
 		DIM (32 nodes)            & 98.01\%          & 20000 (fixed)            & 11.50s (average)         & 32 (fixed)                         \\
 		\textbf{Constructive DIM} & \textbf{97.94\%} & \textbf{21720 (average)} & \textbf{8.23s (average)} & \textbf{22.66 (average)}           \\
 		DIM (time-constrained)    & 96.19\%          & 19911 (average)          & 8.23s (constrained)      & $\lceil$22.66$\rceil$ = 23 (fixed) \\
-		DIM (16 nodes)            & 89.31\%          & 20000 (fixed)            & 6.15s (average)         & 16 (fixed)                         \\
+		DIM (16 nodes)            & 89.31\%          & 20000 (fixed)            & 6.15s (average)         & 16 (fixed)                          \\
 	\end{tabular}
 	\end{adjustbox}
-	\caption[Performances as measured in a dataset of 6-by-6 pixel images with 3-by-3 pixel components.]{Performances as measured in a dataset of 6-by-6 pixel images with 3-by-3 pixel components. \emph{Accuracy} is defined as the percentages of components correctly identified; \emph{cycles} and \emph{training time} refer respectively to cycles and time spent to solve an instance of the problem; \emph{nodes} refers to the number of neurons in the final network.}
+	\caption[Performances in squares problem as measured in a dataset of 6-by-6 pixel images with 3-by-3 pixel components.]{Performances in squares problem as measured in a dataset of 6-by-6 pixel images with 3-by-3 pixel components. \emph{Accuracy} is defined as the percentages of components correctly identified; \emph{cycles} and \emph{training time} refer respectively to cycles and time spent to solve an instance of the problem; \emph{nodes} refers to the number of neurons in the final network.}
 	\label{tab:performance}
 \end{table}
 				To assess the performance of the new algorithm against the original one, I first ran the constructive algorithm over a set of 1000 instances of the problem and collected the relevant data. I then performed two sets of tests on the original algorithm.	The obtained results are reported in table~\ref{tab:performance}.
@@ -788,9 +788,39 @@ end;
 				
 			\subsection{PC/BC--DIM}
 				\subsubsection{Bars problem}
+					The bars problem is a problem which is similar (but easier) to the squares one. The components from which the images are generated are lines (\emph{bars}) of pixels. A common variation of the standard bars problem uses 5-by-5 pixel images in which the 10 possible (one pixel wide) horizontal and vertical bars are independently selected to be present with a probability of $\frac{1}{5}$.
+					
+					To increase the difficulty of the task, noise can be added to the training images by changing the value of each pixel in the training set with a certain probability \cite{spratling2012unsupervised}.
+					
+					\begin{figure}[h]
+						\centering
+						\includegraphics[width=0.6\textwidth]{bars}
+						\caption[Bars component in 5-by-5 pixel images learned by the algorithm.]{Bars component in 5-by-5 pixel images learned by the algorithm. Each cell shows a visual representation of what a neuron responds to. Numbers over images show the corresponding component that the neuron has learned, if any.}
+						\label{fig:bars}
+					\end{figure}
+					
+				\subsubsection{Evaluation of the results}
+\begin{table}[h]
+	\centering
+	\begin{adjustbox}{width=1\textwidth}
+	\begin{tabular}{l*{4}{|c}}
+		\emph{Algorithm}                & \emph{Accuracy}  & \emph{Cycles}            & \emph{Training time}      & \emph{Nodes}             \\
+		\hline
+		PC/BC-DIM (24 nodes)            & 98.33\%          & 20000 (fixed)            & 26.83s (average)          & 24 (fixed)               \\
+		\textbf{Constructive PC/BC-DIM} & \textbf{96.15\%} & \textbf{20000 (average)} & \textbf{16.47s (average)} & \textbf{18.35 (average)} \\
+		PC/BC-DIM (10 nodes)            & 90.33\%          & 20000 (fixed)            & 14.24s (average)          & 10 (fixed)               \\
+	\end{tabular}
+	\end{adjustbox}
+	\caption[Performances in bars problem as measured in a dataset of 5-by-5 pixel images with 0.1 noise.]{Performances in bars problem as measured in a dataset of 5-by-5 pixel images with 0.1 noise. \emph{Accuracy} is defined as the percentages of components correctly identified; \emph{cycles} and \emph{training time} refer respectively to cycles and time spent to solve an instance of the problem; \emph{nodes} refers to the number of neurons in the final network.}
+	\label{tab:performance2}
+\end{table}
+				Performances of the constructive PC/BC--DIM algorithm have been performed following the same procedure of the constructive DIM one. Obtained results are qualitatively similar, even though they are quantitatively different enough to deserve a separated analysis.
 				
-				\subsubsection{Results}
-
+				As shown in table~\ref{tab:performance2}, the developed algorithm was 5.82 percentage points more accurate than the original one when using the theoretically minimal network (which is composed by 10 neurons in the given problem), and 2.18 percentage points less accurate than the original one with size 24 (which was the maximum number of neurons evolved in an instance of the problem by the constructive algorithm).
+				
+				This is a more sensible difference compared to the DIM results. The reasons for this are to be found in the fact that the activation of the error-detecting neurons seem to be less stable in PC/BC--DIM, possibly because of the three matrix of weights that are trained independently and are sometimes slightly inconsistent with each other. Because of that, decisions on the growth of the network are somewhat less informed than the one performed by the constructive DIM algorithm.
+				For the same reason, it was impossible to set an error under which stopping the algorithm, as that often leads to false positives.
+				
 
 	\chapter{Conclusions}
 		The project I developed and the results I obtained prove that there is room for improvement in the original, state-of-the-art Divisive Input Modulation algorithm.
@@ -801,7 +831,7 @@ end;
 		
 		These advantages in flexibility and speed were obtained at very little costs in term of accuracy; the constructive algorithm performed almost identically to the original one even when the latter was set up to train networks that were double the theoretically minimal size.
 		
-		Two further research paths could be pursued in the future. On one hand, the algorithm can be adapted to the multi-stage, hierarchical PC/BC model to evolve deep architectures that perform additional feature extraction. On the other hand, a \emph{pruning} phase based on removing the least activated neurons in the predictive layer could be added as a second step to the algorithm, further reducing the size of the obtained networks.
+		Some further research paths could be pursued in the future. First, a \emph{pruning} phase based on removing the least activated neurons in the predictive layer could be added as a second step to the algorithm, further reducing the size of the obtained networks. Second, criteria that are more tolerant to the instability of the error in the PC/BC--DIM algorithm may be experimented. And finally, the algorithm can be adapted to the multi-stage, hierarchical PC/BC model to evolve deep architectures that perform additional feature extraction. 
 	
 	\bibliographystyle{plain}
 	\bibliography{references}

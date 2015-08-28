@@ -1,6 +1,4 @@
-function recognized = dim_squares()
-
-tic
+function [recognized,n] = dim_squares()
 
 %set network parameters
 beta=0.05;                %learning rate
@@ -110,8 +108,6 @@ end
 
 s=sum(W'), disp(num2str([max(s),min(s),max(max(W)),min(min(W))]))
 disp('');  
-
-toc
 
 
 function [x,patterns,input_set_components]=squares_pattern_randprob(m,s,prob,mincontrast)

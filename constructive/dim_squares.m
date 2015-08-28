@@ -1,4 +1,4 @@
-function [recognized,n] = dim_squares()
+function [n,recognized,cycles] = dim_squares()
 
 %set network parameters
 beta=0.05;                %learning rate
@@ -107,7 +107,8 @@ for t=1:epochs
 end
 
 s=sum(W'), disp(num2str([max(s),min(s),max(max(W)),min(min(W))]))
-disp('');  
+disp('');
+cycles = t*cycs;
 
 
 function [x,patterns,input_set_components]=squares_pattern_randprob(m,s,prob,mincontrast)

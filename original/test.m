@@ -5,8 +5,8 @@ results = [];
 tic;
 
 for i=1:k,
-    [n, r, c] = dim_squares();
-    results = [results; [n, r, c]];
+    r = dim_squares();
+    results = [results; r];
 end;
 
 toc;

@@ -1,4 +1,4 @@
-function [recognized,n] = dim_squares()
+function recognized = dim_squares()
 
 %set network parameters
 beta=0.05;                %learning rate
@@ -8,9 +8,9 @@ epsilon=1e-10;
 %define task
 p=6;                     %length of one side of input image
 s=3;                     %size of square image components
-n=48;                    %number of nodes
+n=27;                    %number of nodes
 m=p*p;                   %number of inputs
-cycs=20000;              %number of training cycles 
+cycs=17560;              %number of training cycles 
 show=1000;               %how often to plot receptive field data
 patterns=1000;           %number of training patterns in training set
 numsquares=(p-s+1).^2;

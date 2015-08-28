@@ -8,7 +8,7 @@ W(W<0)=0;
 
 if nargout>1
   %update feedback weights
-  scale=beta.*heaviside(y-1)*ones(size(e'));
+  scale=beta.*Heaviside(y-1)*ones(size(e'));
   
   V=V.*(1 + delta+scale);
   V(V<0)=0; 

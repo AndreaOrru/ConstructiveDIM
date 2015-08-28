@@ -1,4 +1,4 @@
-function xt=heaviside(x)
+function xt=Heaviside(x)
 
 xt=x; 
 xt(x==0)=0.5;

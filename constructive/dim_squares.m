@@ -25,7 +25,7 @@ mincontrast=1;
 t0 = 1;                      %time of last added neuron
 window = 1;                  %window for slope calculation
 tslope = 0.05;               %trigger slope
-esptsh = 0.35;               %average error until exponential growth
+exptsh = 0.35;               %average error until exponential growth
 cutavg = 0.21;               %average error to cut growing
 stpavg = 0.20;               %average error to stop
 grow   = 1;                  %boolean value to control growing
@@ -87,8 +87,8 @@ for t=1:epochs
   
   %check growing condition
   if grow,
-    %esponential growth
-    if eavg >= esptsh,
+    %exponential growth
+    if eavg >= exptsh,
       t0 = t;
       n = round(n * 1.5);
       W=(1/16)+(1/64).*randn(n,m);			   

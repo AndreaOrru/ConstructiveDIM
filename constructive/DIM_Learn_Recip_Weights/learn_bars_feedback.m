@@ -7,7 +7,7 @@ if nargin<1
 end
 p=5;                     %length of one side of input image/number of bars at
                          %each orientation
-n=2;                     %number of nodes
+n=4;                     %number of nodes
 m=p*p;                   %number of inputs
 epochs=20;               %number of training epochs
 cycs=1000;               %number of training cycles per epoch
@@ -21,9 +21,10 @@ figoffset=0;
 t0 = 1;                      %time of last added neuron
 window = 1;                  %window for slope calculation
 tslope = 0.05;               %trigger slope
-esptsh = 1.00;               %average error until exponential growth
-cutavg = 0.70;               %average error to cut growing
-stop   = 0;                  %boolean value to stop growing
+exptsh = 1.00;               %average error until exponential growth
+cutavg = 0.60;               %average error to cut growing
+stpavg = 0.55;               %average error to stop
+grow   = 1;                  %boolean value to control growing
 eavgs  = zeros(1, epochs);   %average errors per epochs
 
 
@@ -100,18 +101,23 @@ for t=1:epochs
         num2str(max(sum(V'))),' uSum=',num2str(max(sum(U')))]);
     ymax=0;
   end
-  
+
   %check stop condition
+  if eavgs(t) <= stpavg,
+      break;
+  end;
+  
+  %check stop growing condition
   if eavgs(t) <= cutavg,
-      stop = 1;
+      grow = 0;
   end;
   
   %check growing condition
-  if ~stop,
-    %esponential growth
-    if eavg >= esptsh,
+  if grow,
+    %exponential growth
+    if eavg >= exptsh,
       t0 = t;
-      n = n * 2;
+      n = round(n * 1.5);
       [W,V,U]=weight_initialisation_random(n,m);
       y = [];
     
@@ -120,7 +126,9 @@ for t=1:epochs
       if (abs(eavgs(t) - eavgs(t - window)) / eavgs(t0)) < tslope,
         t0 = t;
         n = n + 1;
-        [W,V,U]=weight_initialisation_random(n,m);
+        W=[W; weight_initialisation_random(1,m)];
+        V=[V; weight_initialisation_random(1,m)];
+        U=[U; weight_initialisation_random(1,m)];
         y = [];
       end;
     end;

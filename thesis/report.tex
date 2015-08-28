@@ -93,7 +93,7 @@
 	\chapter{Introduction}
 		\section{Background}
 			\label{sec:background}
-			\nomenclature{ANN}{Artificial Neural Network}
+			\nomenclature{ANN}{Artificial Neural Network.}
 			Artificial neural networks in all their various incarnations have been successfully employed to solve a very wide range of machine learning problems, thanks to their good representational capabilities \cite{sharma2010constructive}.
 		
 			\nomenclature{FFNN}{Feed-Forward Neural Network.}
@@ -574,9 +574,9 @@
 				\label{sec:weight}
 				Another outstanding question is how should weight training occur when the network grows in size? From the point of view of computational efficiency, and assuming that the units already present in the network are useful in part of the reconstruction \cite{kwok1997objective}, it would make sense to implement \emph{weight freezing}, that is, keeping the weights targeting the already existing neurons fixed, and allowing the new ones to vary.
 				
-				However, a case is made by Ash \cite{ash1989dynamic} that holding the existing network values constant only allows finding a solution in an affine subset of the weight space. The experiments I performed confirmed this thesis and the final version of my algorithm thus retrains whole the weights after each topology update. Note, however, that the values of the weights are conserved across the epochs, unless we are in the exponential growth phase: in that case, all the weights get randomly reinitialized. In fact, practical experience has shown that when the topology of the network changes drastically, as its the case when the number of neurons grows buy a multiplicative factor, overall better results are obtained by just restarting the training from scratch.
+				However, a case is made by Ash \cite{ash1989dynamic} that holding the existing network values constant only allows finding a solution in an affine subset of the weight space. The experiments I performed confirmed this thesis and the final version of my algorithm thus retrains whole the weights after each topology update. In fact, practical experience has shown that when the topology of the network changes, better results are obtained by just restarting the training from scratch.
 				
-				The rationale behind it is that the exponential growth phase is meant to just bring the network to a rough approximation of its correct size and it usually lasts very few epochs anyway.
+				The rationale behind it is that the growth phase is meant to just bring the network to an approximation of its correct size and it usually lasts very few epochs anyway.
 			
 			\subsection{Stopping criteria}
 				\label{sec:stopping}

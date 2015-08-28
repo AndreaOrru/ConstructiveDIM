@@ -10,7 +10,7 @@ p=6;                     %length of one side of input image
 s=3;                     %size of square image components
 n=4;                     %number of nodes
 m=p*p;                   %number of inputs
-epochs=50;               %number of training epochs
+epochs=40;               %number of training epochs
 cycs=1000;               %number of training cycles per epoch
 patterns=1000;           %number of training patterns in training set
 numsquares=(p-s+1).^2;
@@ -21,11 +21,11 @@ mincontrast=1;
 
 %constructive parameters
 t0 = 1;                      %time of last added neuron
-window = 1;                  %window for slope calculation
+window = 2;                  %window for slope calculation
 tslope = 0.05;               %trigger slope
-exptsh = 0.35;               %average error until exponential growth
+exptsh = 0.34;               %average error until exponential growth
 cutavg = 0.21;               %average error to cut growing
-stpavg = 0.20;               %average error to stop
+stpavg = 0.1975;             %average error to stop
 mult   = 1.5;                %multiplicative factor for growing
 grow   = 1;                  %boolean value to control growing
 eavgs  = zeros(1, epochs);   %average errors per epoch
@@ -99,7 +99,8 @@ for t=1:epochs
       if (abs(eavgs(t) - eavgs(t - window)) / eavgs(t0)) < tslope,
         t0 = t;
         n = n + 1;
-        W=[W; (1/16)+(1/64).*randn(1,m)];
+        %W=[W; (1/16)+(1/64).*randn(1,m)];
+        W=(1/16)+(1/64).*randn(n,m);
         W(W<0) = 0;
       end;
     end;

@@ -24,8 +24,9 @@ tslope = 0.05;               %trigger slope
 exptsh = 1.00;               %average error until exponential growth
 cutavg = 0.60;               %average error to cut growing
 stpavg = 0.55;               %average error to stop
+mult   = 1.5;                %multiplicative factor for growing
 grow   = 1;                  %boolean value to control growing
-eavgs  = zeros(1, epochs);   %average errors per epochs
+eavgs  = zeros(1, epochs);   %average errors per epoch
 
 
 %GENERATE TRAINING DATA
@@ -82,6 +83,7 @@ for t=1:epochs
 	  U=dim_learn_feedback(U,y,x,beta);
     end
   
+    %update average error
     if ~isempty(e(e>0)),
       eavg = (eavg*(k-1) + mean(abs(e(e>0) - 1))) / k;
     end;
@@ -90,7 +92,7 @@ for t=1:epochs
   end
   
   fprintf(1, 'nodes: %i, error: %f\n',n,eavg);
-  eavgs(t) = eavg;
+  eavgs(t) = eavg;  %save average error into vector
   
   %show results
   if dispresults
@@ -117,7 +119,7 @@ for t=1:epochs
     %exponential growth
     if eavg >= exptsh,
       t0 = t;
-      n = round(n * 1.5);
+      n = round(n * mult);
       [W,V,U]=weight_initialisation_random(n,m);
       y = [];
     

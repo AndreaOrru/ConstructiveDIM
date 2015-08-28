@@ -28,8 +28,9 @@ tslope = 0.05;               %trigger slope
 exptsh = 0.35;               %average error until exponential growth
 cutavg = 0.21;               %average error to cut growing
 stpavg = 0.20;               %average error to stop
+mult   = 1.5;                %multiplicative factor for growing
 grow   = 1;                  %boolean value to control growing
-eavgs  = zeros(1, epochs);   %average errors per epochs
+eavgs  = zeros(1, epochs);   %average errors per epoch
 
 %generate a fixed pattern set
 clear data
@@ -61,6 +62,7 @@ for t=1:epochs
       y=(epsilon+y).*(W*e);
     end
     
+    %update average error
     if ~isempty(e(e>0)),
       eavg = (eavg*(k-1) + mean(abs(e(e>0) - 1))) / k;
     end;
@@ -72,7 +74,7 @@ for t=1:epochs
   
   %show weights
   fprintf(1,'nodes: %i, error: %f, ',n,eavg);
-  eavgs(t) = eavg;
+  eavgs(t) = eavg;  %save average error into vector
   recognized = squares_plot(s,W);
   
   %check stop condition
@@ -90,7 +92,7 @@ for t=1:epochs
     %exponential growth
     if eavg >= exptsh,
       t0 = t;
-      n = round(n * 1.5);
+      n = round(n * mult);
       W=(1/16)+(1/64).*randn(n,m);			   
       W(W<0)=0;	
     

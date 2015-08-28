@@ -514,6 +514,7 @@
 				Even though these algorithm were conceived for simple feed forward neural networks, they have been proven successful even when applied to recurrent networks \cite{ash1989dynamic}.
 				
 			\subsection{Criteria for adding neurons}
+				\label{sec:criteria}
 				One of the main decisions to be made when designing a constructive algorithm is under what conditions should new neurons be added to the network.
 				
 				At first, I experimented with a very simple criterion: simply add a neuron if the overall average error, measured as the absolute distance from $1$ among all the elements of $e$ and for one epoch, is higher than a certain threshold. Results were not very good and the network tended to grow bigger and bigger, which initially led me to introduce a pruning phase to overcome the problem. As stated in section~\ref{sec:classes}, pruning is an inherently inferior solution compared to construction, so I moved forward to explore different approaches.
@@ -549,19 +550,27 @@
 				This proved to be a much better measure than the original one, however the network would still keep growing indefinitely, trying to get a lower error even when the mapping is learned. Clearly, criteria for when to stop adding neurons to the network are needed. So, the algorithm will not add any nodes no matter what once the average error goes under a certain specified threshold:
 				
 				\begin{equation}
-					a_t \leq C
+					a_t \leq C_a
 				\end{equation}
 				
-				where $C$ is the over-mentioned, user-defined threshold.
+				where $C_a$ is the over-mentioned, user-defined threshold.
 				
 				With the last modification, the algorithm performed fairly well, however there was still room for improvement. Specifically, as it is not possible to know \emph{a priori} how big the network is going to be, the algorithm has to start with the smallest possible network, which is the one with a single predictive neuron. However, it can take various iterations to bring the network to an adequate size, especially if the number of components which make up the images is high.
 				
-				Intuition suggests, and experiments have confirmed, that when the number of neurons in the network is largely inadequate to describe the images, then error-detecting neurons are going to yield values whose distance from the unity (and thus from correct representation) is very high. In this case, and thus if the error is over a certain threshold, the algorithm increases the number of neurons by a multiplicative factor until it goes under that threshold. It then starts behaving as described early, i.e. by adding neurons one at a time. This procedure is inspired by the (otherwise unrelated) TCP \emph{congestion control} algorithm \cite{allman2009tcp}, in particular by its \emph{{exponential growth}} phase.
+				Intuition suggests, and experiments have confirmed, that when the number of neurons in the network is largely inadequate to describe the images, then error-detecting neurons are going to yield values whose distance from the unity (and thus from correct representation) is very high. In this case, and thus if the error is over a certain threshold, the algorithm increases the number of neurons by a multiplicative factor until it goes under that threshold. It then starts behaving as described early, i.e. by adding neurons one at a time. This procedure is inspired by the (otherwise unrelated) TCP \emph{congestion control} algorithm \cite{allman2009tcp}, in particular by its \emph{{exponential growth}} phase. Mathematically speaking, the number of neurons is increased by multiplying it by a factor $M$ while the following condition is true:
+				
+				\begin{equation}
+					a_t \geq C_e
+				\end{equation}
+				
+				Where $C_e$ is a user-defined constant.
 				
 			\subsection{Division in epochs}
+				\label{sec:epochs}
 				To efficiently implement the concept of the \emph{window}, explained in the previous section, I decided to modify the original algorithm, by dividing the training procedure in \emph{epochs}. Throughout an epoch, each of which is constituted by a tunable number of cycles, the average of the error across the training set is kept updated. At the end of an epoch, and before starting the next one, the previously mentioned criteria are checked and the topology of the network modified accordingly, if necessary.
 			
 			\subsection{Weight training}
+				\label{sec:weight}
 				Another outstanding question is how should weight training occur when the network grows in size? From the point of view of computational efficiency, and assuming that the units already present in the network are useful in part of the reconstruction \cite{kwok1997objective}, it would make sense to implement \emph{weight freezing}, that is, keeping the weights targeting the already existing neurons fixed, and allowing the new ones to vary.
 				
 				However, a case is made by Ash \cite{ash1989dynamic} that holding the existing network values constant only allows finding a solution in an affine subset of the weight space. The experiments I performed confirmed this thesis and the final version of my algorithm thus retrains whole the weights after each topology update. Note, however, that the values of the weights are conserved across the epochs, unless we are in the exponential growth phase: in that case, all the weights get randomly reinitialized. In fact, practical experience has shown that when the topology of the network changes drastically, as its the case when the number of neurons grows buy a multiplicative factor, overall better results are obtained by just restarting the training from scratch.
@@ -569,17 +578,161 @@
 				The rationale behind it is that the exponential growth phase is meant to just bring the network to a rough approximation of its correct size and it usually lasts very few epochs anyway.
 			
 			\subsection{Stopping criteria}
-				An additional advantage that the designed algorithm has compared to the original one is the presence of a \emph{stopping criterion} based on the error of the network. In fact, I found experimentally that when the error definitely goes under a certain threshold, the network most likely discovered all the image components. In that case, further training is deemed unnecessary and the algorithm can stop.
+				\label{sec:stopping}
+				An additional advantage that the designed algorithm has compared to the original one is the presence of a \emph{stopping criterion} based on the error of the network. In fact, I found experimentally that when the error definitely goes under a certain threshold $C_s$, the network most likely discovered all the image components. In that case, further training is deemed unnecessary and the algorithm can stop.
 			
 		\section{Implementation}
-			\begin{figure}[h]
-				\centering
-				\begin{lstlisting}
-la sega
-				\end{lstlisting}
-				\caption{Some code.}
-				\label{lst:test}
-			\end{figure}
+			In this section I will present some of the most important points related to the actual implementation. The crucial parts of the code will be provided and discussed. Sections which are not relevant for the understanding of the project will be summarized by comments in the code and the symbol \quot{\texttt{...}} will indicate missing code lines. For a full listing of the source code, refer to Appendix A.
+			
+			\subsection{Constructive DIM}
+				The first algorithm I implemented and that I am going to analyse is a constructive version of the negative feedback network with divisive modulation described in section~\ref{sec:dim}.
+			
+				\begin{figure}[h]
+					\caption{Parameters and important variables in the Constructive DIM algorithm.}
+					\label{lst:params_cdim}
+					\centering
+\begin{lstlisting}
+%set network parameters
+beta=0.05;      %learning rate
+iterations=50;  %number of iterations to calculate y
+epsilon=1e-10;
+
+%define task
+p=6;            %length of one side of input image
+s=3;            %size of square image components
+n=4;            %number of nodes
+m=p*p;          %number of inputs
+epochs=50;      %number of training epochs
+cycs=1000;      %number of training cycles per epoch
+patterns=1000;  %number of training patterns in training set
+
+...
+
+%constructive parameters
+t0 = 1;         %time of last added neuron
+window = 1;     %window for slope calculation
+tslope = 0.05;  %trigger slope
+exptsh = 0.35;  %average error until exponential growth
+cutavg = 0.21;  %average error to cut growing
+stpavg = 0.20;  %average error to stop
+mult   = 1.5;   %multiplicative factor for growing
+
+grow   = 1;     %boolean value to control growing
+eavgs  = zeros(1, epochs);  %average errors per epochs
+\end{lstlisting}
+				\end{figure}
+				
+				Figure~\ref{lst:params_cdim} shows the initialisation part of the algorithm, mostly setting up the parameters needed for the actual learning phase. Most of this is straightforward: notice the parameter \texttt{n} (line 9) which regulates how big the initial network is going to be; \texttt{epochs} (line 11) and \texttt{cycs} (line 12) which are respectively the number of epochs the training is divided into, and the number of cycles per epoch (refer to section \ref{sec:epochs} for the rationale behind this).
+				
+				Lines 18-43 initialize the parameters described in section~\ref{sec:criteria}, \ref{sec:weight} and \ref{sec:stopping} which regulate the behaviour of the constructive algorithm. Specifically, \texttt{t0} keeps track of the last epoch when the network structure was modified and corresponds to the variable $t_0$; \texttt{window} controls how far back to look into the epochs history to calculate the slope and corresponds to $w$; \texttt{tslope} is the trigger slope that causes a neuron to be added ($\Delta_T$); \texttt{exptsh} is $C_e$, the threshold over which the size of the network gets multiplied by \texttt{mult} ($M$) at each epoch; \texttt{cutavg} ($C_a$) is the average error under which no neurons are added to the network anymore; under \texttt{stpavg} ($C_s$) the algorithm stops running.
+				
+				Line 26 defines the boolean variable \texttt{grow}, which regulates whether neuron should be added to the network or if the constructive phase is finished. Line 27 sets up a vector (\texttt{eavgs}) which will hold the history of the average errors per epoch, so that the slope can be calculated at runtime.
+
+				Following the parameters initialisation, the matrix $W$ and the dataset are randomly initialized and then the main algorithm runs.
+				
+				Figure~\ref{lst:cdim} shows the main loops that compose the algorithm. The external loop (lines 1-52) iterates over the epochs. For each epoch, an average error throughout that epoch is calculated (\texttt{eavg}); this value gets initialised to zero at line 3.
+				
+				The internal loop (lines 5-17) iterates over the cycles for each epoch; here, $y$ and $e$ are calculated for each training image and weights are updated according to the rules described in section~\ref{sec:dim}. Lines 10-13 maintain a running average of the error throughout the epoch, calculated as a distance from the unity of the non-zero error-detection activations.
+				
+				For each epoch, the calculated average error gets saved into the history vector (line 20). Then the criteria are checked: first (lines 23-26) if learning has converged and the algorithm can be stopped; then if no more neurons have to be added anymore (lines 28-31). Then, if network growing is still enabled (line 34), multiplication of the number of neurons gets performed if the error average for the current epoch is over \texttt{exptsh} ($C_e$), and in that case the matrix of weights gets completely reinitialised (line 39) or alternatively, if equations \ref{eq:slope} (line 44) and \ref{eq:topology} (line 43) are satisfied (that is, the error is not decreasing at the desired rate), a single neuron is added to the network (line 46) and only a new row gets randomly initialised (line 47).
+				
+				\begin{figure}[H]
+					\caption{The main body of the Constructive DIM algorithm.}
+					\label{lst:cdim}
+					\centering
+\begin{lstlisting}
+for t=1:epochs
+  ...
+  eavg = 0;
+
+  for k=1:cycs
+    ...						 
+    %iterate to calculate node activations
+    ...
+    
+    %update average error
+    if ~isempty(e(e>0)),
+      eavg = (eavg*(k-1) + mean(abs(e(e>0) - 1))) / k;
+    end;
+    
+    %update weights
+    ...
+  end
+  
+  ...
+  eavgs(t) = eavg;  %save average error into vector
+  ...
+  
+  %check stop condition
+  if eavgs(t) <= stpavg,
+      break;
+  end;
+  
+  %check stop growing condition
+  if eavgs(t) <= cutavg,
+      grow = 0;
+  end;
+  
+  %check growing condition
+  if grow,
+    %exponential growth
+    if eavg >= exptsh,
+      t0 = t;
+      n = round(n * mult);
+      W=(1/16)+(1/64).*randn(n,m);			   
+      W(W<0)=0;	
+    
+    %gradual growing
+    elseif t - window >= t0,
+      if(abs(eavgs(t) - eavgs(t-window)) / eavgs(t0)) < tslope,
+        t0 = t;
+        n = n + 1;
+        W=[W; (1/16)+(1/64).*randn(1,m)];
+        W(W<0) = 0;
+      end;
+    end;
+  end;
+end
+\end{lstlisting}
+				\end{figure}
+			
+			\subsection{Constructive PC/DC--DIM}
+				The main implementation difference that went into developing a constructive version of the PC/DC--DIM algorithm, compared to the DIM one, is that three matrices of weights get trained simultaneously. So the topology of all three must be updated. Figure~\ref{lst:cpcbcdim} shows the relevant part.
+				
+				\begin{figure}[h]
+					\caption{How the topology gets modified in Constructive PC/BC--DIM,}
+					\label{lst:cpcbcdim}
+					\centering
+\begin{lstlisting}
+...
+%check growing condition
+if grow,
+  %exponential growth
+  if eavg >= exptsh,
+    t0 = t;
+    n = round(n * mult);
+    [W,V,U]=weight_initialisation_random(n,m);
+    y = [];
+    
+  %gradual growing
+  elseif t - window >= t0,
+    if (abs(eavgs(t) - eavgs(t-window)) / eavgs(t0)) < tslope,
+      t0 = t;
+      n = n + 1;
+      W=[W; weight_initialisation_random(1,m)];
+      V=[V; weight_initialisation_random(1,m)];
+      U=[U; weight_initialisation_random(1,m)];
+      y = [];
+    end;
+  end;
+end;
+...
+\end{lstlisting}
+				\end{figure}
+				
+				Lines 9 and 19 augment the $y$ variable (the output of the network) with an extra element. This is needed because PC/BC--DIM supports \emph{continuous learning}, that is, the network is not reset after every image is presented.
+				
+				The rest of the code is functionally equivalent to the Constructive DIM algorithm described in the previous section.
 			
 		\section{Results}
 			In order to assess the quality of the results, the algorithm has been tested against two sets of benchmarks: the \emph{squares} problem and the \emph{bars} problem.
@@ -597,7 +750,7 @@ la sega
 				The squares problem is a more challenging variation of the bars problem with more significant overlapping between components. Each image in the dataset is generated by selecting, at random, elements from a fixed set of elementary image components, which are all $s$-by$s$ pixel squares. Each component gets assigned a probability regulating the frequency of appearance in the dataset; for each image, every selected component gets randomly assigned a \emph{contrast} and a (unique) \emph{depth}. Each pixel in the image thus gets a greyscale value corresponding to the contrast of the foremost square in that location, if any.
 				
 				The algorithms try to identify the components from which the dataset has been composed.
-				
+
 				\subsubsection{Results}
 				\begin{table}[h]
 					\centering

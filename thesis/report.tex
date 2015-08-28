@@ -1,5 +1,6 @@
 \documentclass[11pt,a4paper]{report}
 
+\usepackage{adjustbox}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage[titletoc]{appendix}
@@ -148,7 +149,7 @@
 			\begin{itemize}
 				\item Chapter 1 acts as an introduction to the project, its goals and the problem it solves;
 				\item Chapter 2 provides a survey of the literature, with references to the relevant choices made during the project's undertaking;
-				\item Chapter 3 describes the work conducted in full detail and evaluates the results against the other algorithms described in the literature review;
+				\item Chapter 3 describes the work conducted in full detail and evaluates the results against the original, state-of-the-art DIM algorithm.
 				\item Chapter 4 concludes the body of the document by summarizing the main points of the work and pointing at possible future developments.
 			\end{itemize}
 			A list of the bibliographic references and an appendix containing the whole source code of the project terminate the report.
@@ -473,6 +474,7 @@
 	\chapter{Main Result}
 		\section{Analysis and Design}
 			\subsection{Motivation}
+				\label{sec:motivation}
 				There are various advantages in developing a constructive neural network algorithm over a standard one; some of them are obvious while some of them are more subtle.
 				
 				First of all, as stated in the introductory section, differences in architecture and size can be all the difference needed in making a network useful for the problem. In this field, choices are often the result of trial and error and, as such, often result in designs which are larger than what would be actually needed. This has two main repercussions on the performance of the network.
@@ -586,6 +588,7 @@
 			In this section I will present some of the most important points related to the actual implementation. The crucial parts of the code will be provided and discussed. Sections which are not relevant for the understanding of the project will be summarized by comments in the code and the symbol \quot{\texttt{...}} will indicate missing code lines. For a full listing of the source code, refer to Appendix A.
 			
 			\subsection{Constructive DIM}
+				\nomenclature{CDIM}{Constructive Divisive Input Modulation.}
 				The first algorithm I implemented and that I am going to analyse is a constructive version of the negative feedback network with divisive modulation described in section~\ref{sec:dim}.
 			
 				\begin{figure}[h]
@@ -603,29 +606,29 @@ p=6;            %length of one side of input image
 s=3;            %size of square image components
 n=4;            %number of nodes
 m=p*p;          %number of inputs
-epochs=50;      %number of training epochs
+epochs=40;      %number of training epochs
 cycs=1000;      %number of training cycles per epoch
 patterns=1000;  %number of training patterns in training set
 
 ...
 
 %constructive parameters
-t0 = 1;         %time of last added neuron
-window = 1;     %window for slope calculation
-tslope = 0.05;  %trigger slope
-exptsh = 0.35;  %average error until exponential growth
-cutavg = 0.21;  %average error to cut growing
-stpavg = 0.20;  %average error to stop
-mult   = 1.5;   %multiplicative factor for growing
+t0 = 1;           %time of last added neuron
+window = 2;       %window for slope calculation
+tslope = 0.05;    %trigger slope
+exptsh = 0.34;    %average error until exponential growth
+cutavg = 0.21;    %average error to cut growing
+stpavg = 0.1975;  %average error to stop
+mult   = 1.5;     %multiplicative factor for growing
 
-grow   = 1;     %boolean value to control growing
-eavgs  = zeros(1, epochs);  %average errors per epochs
+grow   = 1;       %boolean value to control growing
+eavgs  = zeros(1, epochs);  %average errors per epoch
 \end{lstlisting}
 				\end{figure}
 				
 				Figure~\ref{lst:params_cdim} shows the initialisation part of the algorithm, mostly setting up the parameters needed for the actual learning phase. Most of this is straightforward: notice the parameter \texttt{n} (line 9) which regulates how big the initial network is going to be; \texttt{epochs} (line 11) and \texttt{cycs} (line 12) which are respectively the number of epochs the training is divided into, and the number of cycles per epoch (refer to section \ref{sec:epochs} for the rationale behind this).
 				
-				Lines 18-43 initialize the parameters described in section~\ref{sec:criteria}, \ref{sec:weight} and \ref{sec:stopping} which regulate the behaviour of the constructive algorithm. Specifically, \texttt{t0} keeps track of the last epoch when the network structure was modified and corresponds to the variable $t_0$; \texttt{window} controls how far back to look into the epochs history to calculate the slope and corresponds to $w$; \texttt{tslope} is the trigger slope that causes a neuron to be added ($\Delta_T$); \texttt{exptsh} is $C_e$, the threshold over which the size of the network gets multiplied by \texttt{mult} ($M$) at each epoch; \texttt{cutavg} ($C_a$) is the average error under which no neurons are added to the network anymore; under \texttt{stpavg} ($C_s$) the algorithm stops running.
+				Lines 18-24 initialize the parameters described in section~\ref{sec:criteria}, \ref{sec:weight} and \ref{sec:stopping} which regulate the behaviour of the constructive algorithm. Specifically, \texttt{t0} keeps track of the last epoch when the network structure was modified and corresponds to the variable $t_0$; \texttt{window} controls how far back to look into the epochs history to calculate the slope and corresponds to $w$; \texttt{tslope} is the trigger slope that causes a neuron to be added ($\Delta_T$); \texttt{exptsh} is $C_e$, the threshold over which the size of the network gets multiplied by \texttt{mult} ($M$) at each epoch; \texttt{cutavg} ($C_a$) is the average error under which no neurons are added to the network anymore; under \texttt{stpavg} ($C_s$) the algorithm stops running.
 				
 				Line 26 defines the boolean variable \texttt{grow}, which regulates whether neuron should be added to the network or if the constructive phase is finished. Line 27 sets up a vector (\texttt{eavgs}) which will hold the history of the average errors per epoch, so that the slope can be calculated at runtime.
 
@@ -635,7 +638,7 @@ eavgs  = zeros(1, epochs);  %average errors per epochs
 				
 				The internal loop (lines 5-17) iterates over the cycles for each epoch; here, $y$ and $e$ are calculated for each training image and weights are updated according to the rules described in section~\ref{sec:dim}. Lines 10-13 maintain a running average of the error throughout the epoch, calculated as a distance from the unity of the non-zero error-detection activations.
 				
-				For each epoch, the calculated average error gets saved into the history vector (line 20). Then the criteria are checked: first (lines 23-26) if learning has converged and the algorithm can be stopped; then if no more neurons have to be added anymore (lines 28-31). Then, if network growing is still enabled (line 34), multiplication of the number of neurons gets performed if the error average for the current epoch is over \texttt{exptsh} ($C_e$), and in that case the matrix of weights gets completely reinitialised (line 39) or alternatively, if equations \ref{eq:slope} (line 44) and \ref{eq:topology} (line 43) are satisfied (that is, the error is not decreasing at the desired rate), a single neuron is added to the network (line 46) and only a new row gets randomly initialised (line 47).
+				For each epoch, the calculated average error gets saved into the history vector (line 20). Then the criteria are checked: first (lines 23-26) if learning has converged and the algorithm can be stopped; then if no more neurons have to be added anymore (lines 28-31). Then, if network growing is still enabled (line 34), multiplication of the number of neurons gets performed if the error average for the current epoch is over \texttt{exptsh} ($C_e$), or alternatively, if equations \ref{eq:slope} (line 44) and \ref{eq:topology} (line 43) are satisfied (that is, the error is not decreasing at the desired rate), a single neuron is added to the network (line 46). In either cases, the matrix of weights gets reinitialised (lines 39 and 47).
 				
 				\begin{figure}[H]
 					\caption{The main body of the Constructive DIM algorithm.}
@@ -685,10 +688,10 @@ for t=1:epochs
     
     %gradual growing
     elseif t - window >= t0,
-      if(abs(eavgs(t) - eavgs(t-window)) / eavgs(t0)) < tslope,
+      if (abs(eavgs(t) - eavgs(t - window)) / eavgs(t0)) < tslope,
         t0 = t;
         n = n + 1;
-        W=[W; (1/16)+(1/64).*randn(1,m)];
+        W=(1/16)+(1/64).*randn(n,m);
         W(W<0) = 0;
       end;
     end;
@@ -701,7 +704,7 @@ end
 				The main implementation difference that went into developing a constructive version of the PC/DC--DIM algorithm, compared to the DIM one, is that three matrices of weights get trained simultaneously. So the topology of all three must be updated. Figure~\ref{lst:cpcbcdim} shows the relevant part.
 				
 				\begin{figure}[h]
-					\caption{How the topology gets modified in Constructive PC/BC--DIM,}
+					\caption{How the topology gets modified in Constructive PC/BC--DIM.}
 					\label{lst:cpcbcdim}
 					\centering
 \begin{lstlisting}
@@ -720,9 +723,7 @@ if grow,
     if (abs(eavgs(t) - eavgs(t-window)) / eavgs(t0)) < tslope,
       t0 = t;
       n = n + 1;
-      W=[W; weight_initialisation_random(1,m)];
-      V=[V; weight_initialisation_random(1,m)];
-      U=[U; weight_initialisation_random(1,m)];
+      [W,V,U]=weight_initialisation_random(n,m);
       y = [];
     end;
   end;
@@ -755,32 +756,52 @@ end;
 				\begin{figure}[h]
 					\centering
 					\includegraphics[width=0.7\textwidth]{learning_squares}
-					\caption{Constructive DIM algorithm while in the process of learning 3-by-3 components in 6-by-6 pixel images. Each cell shows a visual representation of what a neuron responds to. Numbers over images show the corresponding component that the neuron has learned, if any.}
+					\caption[Constructive DIM algorithm in the process of learning 3-by-3 components in 6-by-6 pixel images]{Constructive DIM algorithm while in the process of learning 3-by-3 components in 6-by-6 pixel images. Each cell shows a visual representation of what a neuron responds to. Numbers over images show the corresponding component that the neuron has learned, if any.}
 					\label{fig:learning_squares}
 				\end{figure}
-
-				\subsubsection{Results}
-				\begin{table}[h]
-					\centering
-					\begin{tabular}{l*{4}{c}}
-						Algorithm         & Accuracy & Cycles & Training time & Neurons \\
-						\hline
-						DIM               & 100\%    & 20000  & 18.9770s      & 48      \\
-						Constructive DIM  & 100\%    & 20000  & 42s           & 48      \\
-					\end{tabular}
-					\caption{Performances as measured in a dataset of 6-by-6 pixel images with 3-by-3 pixel components.}
-					\label{tab:performance}
-				\end{table}
+				
+				\newpage
+				
+				\subsubsection{Evaluation of the results}
+\begin{table}[h]
+	\centering
+	\begin{adjustbox}{width=1\textwidth}
+	\begin{tabular}{l*{4}{|c}}
+		\emph{Algorithm}          & \emph{Accuracy}  & \emph{Cycles}            & \emph{Training time}     & \emph{Nodes}                       \\
+		\hline
+		DIM (32 nodes)            & 98.01\%          & 20000 (fixed)            & 11.50s (average)         & 32 (fixed)                         \\
+		\textbf{Constructive DIM} & \textbf{97.94\%} & \textbf{21720 (average)} & \textbf{8.23s (average)} & \textbf{22.66 (average)}           \\
+		DIM (time-constrained)    & 96.19\%          & 19911 (average)          & 8.23s (constrained)      & $\lceil$22.66$\rceil$ = 23 (fixed) \\
+		DIM (16 nodes)            & 89.31\%          & 20000 (fixed)            & 6.15s (average)         & 16 (fixed)                         \\
+	\end{tabular}
+	\end{adjustbox}
+	\caption[Performances as measured in a dataset of 6-by-6 pixel images with 3-by-3 pixel components.]{Performances as measured in a dataset of 6-by-6 pixel images with 3-by-3 pixel components. \emph{Accuracy} is defined as the percentages of components correctly identified; \emph{cycles} and \emph{training time} refer respectively to cycles and time spent to solve an instance of the problem; \emph{nodes} refers to the number of neurons in the final network.}
+	\label{tab:performance}
+\end{table}
+				To assess the performance of the new algorithm against the original one, I first ran the constructive algorithm over a set of 1000 instances of the problem and collected the relevant data. I then performed two sets of tests on the original algorithm.	The obtained results are reported in table~\ref{tab:performance}.
+				
+				On the first one, I ran the algorithm with the default parameters (20000 cycles) and with the maximum number of nodes that was ever reached during all the trials performed by the constructive algorithm (that is, 32). What I wanted to verify was how much better could DIM perform in the ideal case where the number of needed neurons is known. The standard algorithm was approximately 40\% slower and was more accurate by merely 0.07 percentage points.
+				
+				The second test was performed over a slightly modified version of the original algorithm that is forced to terminate in a given number of seconds. I set the number of neurons to the average that was needed by the constructive process and the maximum time to the average time needed by the constructive algorithm. I wanted to examine exactly how inferior the original algorithm was when using the most common learned topology and in the same amount of time that the constructive algorithm usually needs. Under these conditions, the original algorithm was less accurate than the developed one by 1.75 percentage points.
+				
+				Furthermore, the results shows that, in order to converge smoothly to the correct solution, the DIM algorithm seems to require a slightly larger number of neurons compared to theoretical minimum, which is of course the number of components from which the images are generated. In the case of the tests performed in table~\ref{tab:performance} for example, the number of 3-by-3 pixel components is 16; however, the smallest network evolved by the constructive algorithm contained 21 predictive neurons. Tests performed with the original algorithm and 16 neurons (also listed in table~\ref{tab:performance}), showed poor results, confirming this thesis.
 				
 			\subsection{PC/BC--DIM}
 				\subsubsection{Bars problem}
 				
-				
 				\subsubsection{Results}
-		
-		\section{Discussion}
-		
+
+
 	\chapter{Conclusions}
+		The project I developed and the results I obtained prove that there is room for improvement in the original, state-of-the-art Divisive Input Modulation algorithm.
+		
+		I showed how it is possible, by only using knowledge internal to the network (that is, the output of its error-detecting neurons) and in a purely unsupervised fashion, to derive indications about the optimal size of the network and employ them to evolve its architecture while learning is taking place.
+		
+		Importantly, the developed algorithm eliminates the need to perform \emph{trial-and-error} to discover the right size of the network and can thus be applied to tasks where the number of image components is unknown beforehand. Furthermore, the evolved networks often come close to the theoretically optimal size, with the immediate consequence of being faster, both to train and to use.
+		
+		These advantages in flexibility and speed were obtained at very little costs in term of accuracy; the constructive algorithm performed almost identically to the original one even when the latter was set up to train networks that were double the theoretically minimal size.
+		
+		Two further research paths could be pursued in the future. On one hand, the algorithm can be adapted to the multi-stage, hierarchical PC/BC model to evolve deep architectures that perform additional feature extraction. On the other hand, a \emph{pruning} phase based on removing the least activated neurons in the predictive layer could be added as a second step to the algorithm, further reducing the size of the obtained networks.
 	
 	\bibliographystyle{plain}
 	\bibliography{references}

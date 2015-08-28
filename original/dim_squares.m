@@ -8,7 +8,7 @@ epsilon=1e-10;
 %define task
 p=6;                     %length of one side of input image
 s=3;                     %size of square image components
-n=27;                    %number of nodes
+n=25;                    %number of nodes
 m=p*p;                   %number of inputs
 cycs=17560;              %number of training cycles 
 show=1000;               %how often to plot receptive field data

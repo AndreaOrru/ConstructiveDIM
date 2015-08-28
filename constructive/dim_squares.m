@@ -27,6 +27,7 @@ exptsh = 0.34;               %average error until exponential growth
 cutavg = 0.21;               %average error to cut growing
 stpavg = 0.1975;             %average error to stop
 mult   = 1.5;                %multiplicative factor for growing
+
 grow   = 1;                  %boolean value to control growing
 eavgs  = zeros(1, epochs);   %average errors per epoch
 
@@ -99,7 +100,6 @@ for t=1:epochs
       if (abs(eavgs(t) - eavgs(t - window)) / eavgs(t0)) < tslope,
         t0 = t;
         n = n + 1;
-        %W=[W; (1/16)+(1/64).*randn(1,m)];
         W=(1/16)+(1/64).*randn(n,m);
         W(W<0) = 0;
       end;

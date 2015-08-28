@@ -128,9 +128,7 @@ for t=1:epochs
       if (abs(eavgs(t) - eavgs(t - window)) / eavgs(t0)) < tslope,
         t0 = t;
         n = n + 1;
-        W=[W; weight_initialisation_random(1,m)];
-        V=[V; weight_initialisation_random(1,m)];
-        U=[U; weight_initialisation_random(1,m)];
+        [W,V,U]=weight_initialisation_random(n,m);
         y = [];
       end;
     end;

@@ -1,0 +1,66 @@
+\documentclass{beamer}
+\usetheme{Warsaw}
+
+\title[Implementation of a Constructive Neural Network]{Design, Implementation and Testing of a Constructive Neural Network Algorithm}
+\author[Andrea Orru]{\textbf{Andrea Orru} \small{(ID: 1473018)} \\ \small{Supervisor: Michael Spratling}}
+\institute[King's College London]{Department of Informatics \\ King's College London}
+\date{2014/2015}
+\subject{MSc Intelligent Systems}
+
+\begin{document}
+	\frame{\titlepage}
+	
+	\begin{frame}
+		\frametitle{Table of Contents}
+		\tableofcontents
+	\end{frame}
+	
+	\section{Introduction}
+		\subsection{Problem and motivation}
+			\begin{frame}
+				\frametitle{Problem and motivation}
+				\framesubtitle{Artificial Neural Networks and their topology}
+				\begin{block}{Artificial Neural Networks}
+					\emph{Artificial neural networks} are a powerful model in machine learning. In theory, an adequately large artificial neural network is an \emph{universal approximator}.
+				\end{block}
+				\begin{alertblock}{Topology}
+					In practice, \textbf{too small} networks are unable to learn the problem, while \textbf{overly large} ones tend to \emph{overfit} the training data.
+				\end{alertblock}
+			\end{frame}
+			\begin{frame}
+				\frametitle{Problem and motivation}
+				\framesubtitle{Choosing the topology}
+				\begin{block}{Trial and error}
+					The architecture of the network is often determined by \emph{trial and error} based on previous experience.
+				\end{block}
+				\begin{block}{Learning the topology}
+					An interesting alternative is \textbf{discovering the topology} as part of the learning algorithm.
+				\end{block}
+				\begin{exampleblock}{Constructive Neural Network}
+					Algorithms that starts from a minimal architecture and then add nodes, connections and layers are called \textbf{\emph{constructive}}.
+				\end{exampleblock}
+			\end{frame}
+			\begin{frame}
+				\frametitle{Problem and motivation}
+				\framesubtitle{Problem definition}
+				\begin{exampleblock}{The problem}
+					In this project I developed a \textbf{constructive version} of the existing \emph{Divisive Input Modulation} algorithm.
+				\end{exampleblock}
+				\begin{block}{Divisive Input Modulation}
+					DIM is an unsupervised training algorithm that has state-of-the-art performances in \textbf{image decomposition}.
+				\end{block}
+			\end{frame}
+		
+		\subsection{Background}
+			\begin{frame}
+				\frametitle{Image decomposition}
+			\end{frame}
+			\begin{frame}
+				\frametitle{Divisive Input Modulation}
+			\end{frame}
+		
+	\section{The constructive algorithm}
+	
+	\section{Conclusions}
+		
+\end{document}

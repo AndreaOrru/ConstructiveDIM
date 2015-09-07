@@ -61,7 +61,7 @@
 				\frametitle{Problem and motivation}
 				\framesubtitle{Problem definition}
 				\begin{exampleblock}{The problem}
-					In this project I developed a \textbf{constructive version} of the existing \emph{Divisive Input Modulation} algorithm.
+					In this project I developed a \textbf{constructive version} of the existing \emph{Divisive Input Modulation} algorithm and its variant \emph{PC/BC--DIM}.
 				\end{exampleblock}
 				\begin{block}{Why?}
 					Small network are \textbf{faster} and \textbf{generalize} better.
@@ -105,7 +105,24 @@
 					    \end{block}
 				\end{columns}
 			\end{frame}
-		
+
+			\begin{frame}
+				\frametitle{PC/BC--DIM}
+				\framesubtitle{Predictive Coding as Biased Competition}  
+				\begin{figure}[h]
+					\centering
+					\includegraphics[width=0.75\textwidth]{pcbc}
+				\end{figure}
+				\begin{small}
+					\begin{block}{PC/BC}
+						It is a hierarchical model which allows \emph{excitatory feedback} to be fed back to previous stages as a model for \textbf{attention} in biological systems.
+					\end{block}
+					\begin{block}{PC/BC--DIM}
+						When DIM is applied to this model, matrix of weights are learned \textbf{independently} (as it is biologically plausible).
+					\end{block}
+				\end{small}
+			\end{frame}
+				
 		
 	\section{Implemented algorithm}
 		\subsection{Analysis}
@@ -204,37 +221,68 @@
 					\includegraphics[width=\textwidth]{squares}
 				\end{figure}
 			\end{frame}
-			
+
 			\begin{frame}
 				\frametitle{Constructive DIM}
 				\framesubtitle{Squares problem}
+				\begin{table}[h]
+					\centering
+					\begin{adjustbox}{width=1\textwidth}
+						\begin{tabular}{l*{4}{|c}}
+							\emph{Algorithm}          & \emph{Accuracy}  & \emph{Cycles}            & \emph{Training time}     & \emph{Nodes}                       \\
+							\hline
+							DIM (32 nodes)            & 98.01\%          & 20000 (fixed)            & 11.50s (average)         & 32 (fixed)                         \\
+							\textbf{Constructive DIM} & \textbf{97.94\%} & \textbf{21720 (average)} & \textbf{8.23s (average)} & \textbf{22.66 (average)}           \\
+							DIM (time-constrained)    & 96.19\%          & 19911 (average)          & 8.23s (constrained)      & $\lceil$22.66$\rceil$ = 23 (fixed) \\
+							DIM (16 nodes)            & 89.31\%          & 20000 (fixed)            & 6.15s (average)         & 16 (fixed)                          \\
+						\end{tabular}
+					\end{adjustbox}
+				\end{table}
+				\begin{columns}[c]
+					\column{0.7\textwidth}
+					\begin{small}
+						\begin{itemize}
+							\item 16 real components.
+							\item \textbf{Constructive DIM} was almost as accurate as a 32 nodes DIM network, while being \textbf{\url{~}40\% faster} and using \textbf{22.66 nodes} on average.
+							\item DIM running on the same conditions (fixed execution time and 23 nodes) performed slightly worse than Constructive DIM.
+						\end{itemize}
+					\end{small}
+					\column{0.4\textwidth}	
+					\begin{figure}[h]
+						\centering
+						\includegraphics[width=\textwidth]{learning_squares}
+					\end{figure}
+				\end{columns}
+			\end{frame}
+
+			\begin{frame}
+				\frametitle{Constructive PC/BC--DIM}
+				\framesubtitle{Bars problem}
 \begin{table}[h]
 	\centering
 	\begin{adjustbox}{width=1\textwidth}
-		\begin{tabular}{l*{4}{|c}}
-			\emph{Algorithm}          & \emph{Accuracy}  & \emph{Cycles}            & \emph{Training time}     & \emph{Nodes}                       \\
-			\hline
-			DIM (32 nodes)            & 98.01\%          & 20000 (fixed)            & 11.50s (average)         & 32 (fixed)                         \\
-			\textbf{Constructive DIM} & \textbf{97.94\%} & \textbf{21720 (average)} & \textbf{8.23s (average)} & \textbf{22.66 (average)}           \\
-			DIM (time-constrained)    & 96.19\%          & 19911 (average)          & 8.23s (constrained)      & $\lceil$22.66$\rceil$ = 23 (fixed) \\
-			DIM (16 nodes)            & 89.31\%          & 20000 (fixed)            & 6.15s (average)         & 16 (fixed)                          \\
-		\end{tabular}
+	\begin{tabular}{l*{4}{|c}}
+		\emph{Algorithm}                & \emph{Accuracy}  & \emph{Cycles}            & \emph{Training time}      & \emph{Nodes}             \\
+		\hline
+		PC/BC-DIM (24 nodes)            & 98.33\%          & 20000 (fixed)            & 26.83s (average)          & 24 (fixed)               \\
+		\textbf{Constructive PC/BC-DIM} & \textbf{96.15\%} & \textbf{20000 (average)} & \textbf{16.47s (average)} & \textbf{18.35 (average)} \\
+		PC/BC-DIM (10 nodes)            & 90.33\%          & 20000 (fixed)            & 14.24s (average)          & 10 (fixed)               \\
+	\end{tabular}
 	\end{adjustbox}
 \end{table}
 				\begin{columns}[c]
 					\column{0.7\textwidth}
-						\begin{small}
-							\begin{itemize}
-								\item 16 real components.
-								\item \textbf{Constructive DIM} was almost as accurate as a 32 nodes DIM network, while being \textbf{\url{~}40\% faster} and using \textbf{22.66 nodes} on average.
-								\item DIM running on the same conditions (fixed execution time and 23 nodes) performed slightly worse than Constructive DIM.
-							\end{itemize}
-						\end{small}
+					\begin{small}
+						\begin{itemize}
+							\item 10 real components.
+							\item \textbf{Constructive PC/BC--DIM} was slightly less accurate than a 24 nodes PC/BC--DIM network, while being \textbf{\url{~}60\% faster} and using \textbf{18.35 nodes} on average.
+						\end{itemize}
+					\end{small}
 					\column{0.4\textwidth}	
-						\begin{figure}[h]
-							\centering
-							\includegraphics[width=\textwidth]{learning_squares}
-						\end{figure}
+					\begin{figure}[h]
+						\centering
+						\includegraphics[width=\textwidth]{learning_bars}
+					\end{figure}
 				\end{columns}
 			\end{frame}
 			
@@ -248,5 +296,8 @@
 			\begin{block}{Results}
 				The resulting algorithm has the same level of accuracy, but it is faster and produces small networks.
 			\end{block}
+			\begin{exampleblock}{Future developments}
+				A second phase of \emph{pruning} may be added over the constructive one, to generate even smaller networks. Also, a version for the \emph{multi-stage} PC/BC algorithm can be developed.
+			\end{exampleblock}
 		\end{frame}
 \end{document}
